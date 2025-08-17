@@ -6,7 +6,6 @@
 	"semi": true,
 	"bracketSpacing": true,
 	"quoteProps": "preserve",
-	"endOfLine": "auto",
 	"trailingComma": "all",
 	"arrowParens": "always"
 }

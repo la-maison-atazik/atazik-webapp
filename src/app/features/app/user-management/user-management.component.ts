@@ -132,6 +132,11 @@ export class UserManagementComponent implements OnInit {
 	 */
 	protected confirmInviteDialog() {
 		this.fetchUsers();
+		this.messageService.add({
+			severity: "success",
+			summary: "Invitation envoyée",
+			detail: "L'invitation a été envoyée avec succès.",
+		});
 	}
 
 	protected openEditRoleDialog(user: FirebaseUserRow) {

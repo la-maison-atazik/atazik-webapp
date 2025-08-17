@@ -1,0 +1,63 @@
+<!--<p-table-->
+<!--	#table_subscribers-->
+<!--	[value]="subscriberRows"-->
+<!--	[scrollable]="true"-->
+<!--	[loading]="loading"-->
+<!--	[globalFilterFields]="['displayName', 'email', 'roleChip.label', 'statusChip.label']"-->
+<!--&gt;-->
+<!--	<ng-template #header>-->
+<!--		<tr>-->
+<!--			<th>Nom</th>-->
+<!--			<th>Status du compte</th>-->
+<!--			<th>Rôle</th>-->
+<!--			<th class="action-header-cell"></th>-->
+<!--		</tr>-->
+<!--	</ng-template>-->
+
+<!--	<ng-template #body let-subscriber>-->
+<!--		<tr>-->
+<!--			<td>-->
+<!--				<div class="name-table-container">-->
+<!--						<span-->
+<!--							class="display-name-text">{{ user.displayName + (user.uid === auth.currentUser!.uid ? " (Vous)" : "") }}</span>-->
+<!--					<span class="email-text">{{ user.email }}</span>-->
+<!--				</div>-->
+<!--			</td>-->
+<!--			<td>-->
+<!--				<p-chip [label]="user.statusChip.label" [icon]="user.statusChip.icon" [removable]="user.statusChip.removable"-->
+<!--								class="{{ user.statusChip.class }}"/>-->
+<!--			</td>-->
+<!--			<td>-->
+<!--				<p-chip [label]="user.roleChip.label" [icon]="user.roleChip.icon" [removable]="user.roleChip.removable"-->
+<!--								class="role-chip {{ user.roleChip.class }}"/>-->
+<!--			</td>-->
+<!--			<td class="action-cell"-->
+<!--					[pTooltip]="user.uid === auth.currentUser!.uid ? 'Vous ne pouvez pas modifier votre propre rôle ou supprimer votre compte.' : ''"-->
+<!--					tooltipPosition="top">-->
+<!--				@if (user.status === UserStatusEnum.ACTIVATED) {-->
+<!--					<p-button icon="pi pi-pencil" class="action-button" text-->
+<!--										[disabled]="user.uid === auth.currentUser!.uid || isUserRoleEqualOrHigher(role()!, user.role)"-->
+<!--										aria-label="Modifier le rôle de l'utilisateur"-->
+<!--										(click)="openEditRoleDialog(user)"/>-->
+<!--				} @else if (user.status === UserStatusEnum.INVITED) {-->
+<!--					<p-button icon="pi pi-envelope" class="action-button" text severity="info"-->
+<!--										aria-label="Renvoyer l'invitation à l'utilisateur"-->
+<!--										(click)="reSendInviteEmail(user)"/>-->
+<!--				}-->
+<!--				<p-button icon="pi pi-trash" class="action-button" text severity="danger"-->
+<!--									[disabled]="user.uid === auth.currentUser!.uid || (user.status === UserStatusEnum.ACTIVATED && isUserRoleEqualOrHigher(role()!, user.role))"-->
+<!--									aria-label="Supprimer l'utilisateur"-->
+<!--									(click)="openDeleteUserDialog(user)"/>-->
+
+<!--			</td>-->
+<!--		</tr>-->
+<!--	</ng-template>-->
+
+<!--	<ng-template #emptymessage>-->
+<!--		<tr>-->
+<!--			<td colspan="8" class="empty-table-msg">Aucun utilisateur trouvé.<br>La recherche est invalide ou une erreur-->
+<!--				s'est produite.-->
+<!--			</td>-->
+<!--		</tr>-->
+<!--	</ng-template>-->
+<!--</p-table>-->

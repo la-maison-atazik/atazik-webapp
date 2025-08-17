@@ -174,7 +174,7 @@ export const inviteUserByEmail = functions.https.onCall({ secrets: [emailPass] }
 				role: role,
 				status: UserStatusEnum.INVITED,
 				createdAt: admin.firestore.FieldValue.serverTimestamp(),
-				expiresAt: Date.now() + 24 * 60 * 60 * 1000, // expire dans 1 jour
+				expiresAt: Date.now() + 60 * 60 * 1000, // expire dans 1 heure
 			});
 
 		// Générer le lien de connexion/création d'e-mail
@@ -195,7 +195,7 @@ export const inviteUserByEmail = functions.https.onCall({ secrets: [emailPass] }
         <p>Vous avez été invité à créer un compte sur ${appName.value()} avec le rôle ${getUserRoleLabel(role)}.</p>
         <p>Cliquez sur le lien ci-dessous pour finaliser la création de votre compte :</p>
         <p><a href="${link}">Finaliser l'inscription</a></p>
-        <p>Ce lien expirera dans un certain temps. Ne le partagez pas.</p>
+        <p>Ce lien expirera dans une heure. Ne le partagez pas.</p>
         <p>Cordialement,</p>
         <p>L'équipe ${appName.value()}</p>
       `,
@@ -368,7 +368,7 @@ export const resendInviteUser = functions.https.onCall({ secrets: [emailPass] },
 				<p>Vous avez été invité à créer un compte sur ${appName.value()} avec le rôle ${getUserRoleLabel(pendingInviteData.role)}.</p>
 				<p>Cliquez sur le lien ci-dessous pour finaliser la création de votre compte :</p>
 				<p><a href="${link}">Finaliser l'inscription</a></p>
-				<p>Ce lien expirera dans un certain temps. Ne le partagez pas.</p>
+				<p>Ce lien expirera dans une heure. Ne le partagez pas.</p>
 				<p>Cordialement,</p>
 				<p>L'équipe ${appName.value()}</p>
 			`,
@@ -380,7 +380,7 @@ export const resendInviteUser = functions.https.onCall({ secrets: [emailPass] },
 		.collection(FirestoreCollectionsEnum.PENDING_INVITES)
 		.doc(uid)
 		.update({
-			expiresAt: Date.now() + 24 * 60 * 60 * 1000, // expire dans 1 jour
+			expiresAt: Date.now() + 60 * 60 * 1000, // expire dans 1 heure
 		})
 		.catch((error) => {
 			console.error("Error updating pending invite expiration:", error);

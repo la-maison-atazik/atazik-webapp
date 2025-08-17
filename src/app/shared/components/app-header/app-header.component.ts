@@ -28,6 +28,7 @@ export class AppHeaderComponent {
 	});
 
 	protected isSignUpUrl = this.router.url.includes("finish-signup");
+	protected isRegistrationUrl = this.router.url.includes("new-registration");
 
 	confirmSignOut() {
 		this.confirmationService.confirm({

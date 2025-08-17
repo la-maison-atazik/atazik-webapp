@@ -9,6 +9,10 @@
 			<a routerLink="/app" routerLinkActive="active-link" aria-label="Accueil">
 				<span>Accueil</span>
 			</a>
+			<a routerLink="/app/subscriber-management" routerLinkActive="active-link"
+				 aria-label="Adhérents et responsables légaux">
+				<span>Adhérents et responsables légaux</span>
+			</a>
 			@if (isPresidentOrHigher()) {
 				<a routerLink="/app/user-management" routerLinkActive="active-link" aria-label="Gestion des utilisateurs">
 					<span>Gestion des utilisateurs</span>

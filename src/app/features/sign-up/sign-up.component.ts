@@ -5,7 +5,7 @@ import {
 	isSignInWithEmailLink,
 	signInWithEmailLink,
 	updatePassword,
-	updateProfile
+	updateProfile,
 } from "@angular/fire/auth";
 import { CardModule } from "primeng/card";
 import { DividerModule } from "primeng/divider";
@@ -25,6 +25,7 @@ import { MessageService } from "primeng/api";
 import { getUserRoleLabel } from "@shared/utils/user-role.utils";
 import { UserInvite } from "@shared/models/user-invite.model";
 import { matchFields } from "../../shared/validators/password-confirm.validator";
+import { FirestoreCollectionsEnum } from "@shared/enums/firebase/firestore-collections.enum";
 
 @Component({
 	selector: "app-sign-up",
@@ -126,7 +127,7 @@ export class SignUpComponent implements OnInit {
 			return Promise.resolve(null);
 		}
 
-		const docRef = doc(this.firestore, `pendingInvites/${this.token}`);
+		const docRef = doc(this.firestore, `${FirestoreCollectionsEnum.PENDING_INVITES}/${this.token}`);
 		return getDoc(docRef).then((doc) => {
 			if (doc.exists()) {
 				return doc.data() as UserInvite;

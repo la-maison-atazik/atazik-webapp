@@ -3,18 +3,6 @@
 :host {
 	@include container();
 
-	@media (max-width: 768px) {
-		padding: 2rem;
-	}
-
-	h2 {
-		margin-bottom: 1rem;
-	}
-
-	.page-description {
-		max-width: 40rem;
-	}
-
 	p-card {
 		width: 100%;
 		flex: 1;
@@ -24,7 +12,7 @@
 		flex-direction: column;
 
 		.research-bar {
-			width: 100%;
+			width: 60%;
 
 			input {
 				width: 100%;
