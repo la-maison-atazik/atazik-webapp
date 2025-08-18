@@ -130,15 +130,9 @@ p-password {
 	}
 }
 
-// Prevent ripple effect on accordion header that causes issues
-.p-accordion .p-accordion-header .p-ripple {
-	display: none !important;
-}
-
 .p-accordion-header {
-	overflow: hidden; /* avoids ripple spreading outside */
-}
-
-.p-accordion-header .p-ripple {
-	display: none;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }

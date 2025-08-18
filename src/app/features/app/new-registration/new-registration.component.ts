@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, signal } from "@angular/core";
+import { Component, inject, OnInit, signal } from "@angular/core";
 import { ConfirmDialog } from "primeng/confirmdialog";
 import { ToastModule } from "primeng/toast";
 import { ButtonModule } from "primeng/button";
@@ -8,31 +8,24 @@ import { CardModule } from "primeng/card";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { AccordionModule } from "primeng/accordion";
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
-import { InputText } from "primeng/inputtext";
+import { InputTextModule } from "primeng/inputtext";
 import { FloatLabelModule } from "primeng/floatlabel";
-import { DatePicker } from "primeng/datepicker";
-import { Checkbox } from "primeng/checkbox";
+import { DatePickerModule } from "primeng/datepicker";
+import { CheckboxModule } from "primeng/checkbox";
 import { CommonModule } from "@angular/common";
 import { consentsMandatory } from "../../../shared/validators/consents-mandatory.validator";
 import { Auth } from "@angular/fire/auth";
 import { ACTIVITIES_CATALOG } from "../../../core/constants/activities.constant";
-import { Message } from "primeng/message";
-import { Select } from "primeng/select";
+import { MessageModule } from "primeng/message";
+import { SelectModule } from "primeng/select";
+import { ChipModule } from "primeng/chip";
+import { Textarea } from "primeng/textarea";
+import { Firestore } from "@angular/fire/firestore";
+import { ActivityOption } from "../../../core/models/activity-option.model";
+import { SubscriberAtazik, subscriberFromFormRegistration } from "../../../core/models/subscriber.model";
 
 export type PaymentMethod = "" | "1x" | "3x" | "10x";
 export type MeanOfPayment = "virement" | "cheque" | "ancv" | "chequier_jeune";
-
-export interface ActivityOption {
-	label: string;
-	price: number;
-	duration?: string;
-}
-
-export interface ActivityCategory {
-	id: string;
-	name: string;
-	options: ActivityOption[];
-}
 
 @Component({
 	selector: "app-new-registration",
@@ -46,13 +39,15 @@ export interface ActivityCategory {
 		CardModule,
 		AccordionModule,
 		ReactiveFormsModule,
-		InputText,
+		InputTextModule,
 		FloatLabelModule,
-		DatePicker,
-		Checkbox,
+		DatePickerModule,
+		CheckboxModule,
 		FormsModule,
-		Message,
-		Select,
+		MessageModule,
+		SelectModule,
+		ChipModule,
+		Textarea,
 	],
 	providers: [ConfirmationService, MessageService],
 	templateUrl: "./new-registration.component.html",
@@ -60,8 +55,10 @@ export interface ActivityCategory {
 })
 export class NewRegistrationComponent implements OnInit {
 	private confirmationService = inject(ConfirmationService);
+	private messageService = inject(MessageService);
 	private formBuilder = inject(FormBuilder);
 	private auth = inject(Auth);
+	private firestore = inject(Firestore);
 
 	// Paramètres
 	protected readonly subscriptionCost = 10; // €
@@ -91,7 +88,6 @@ export class NewRegistrationComponent implements OnInit {
 		activities: this.formBuilder.array([] satisfies FormGroup[]),
 		payment: this.formBuilder.group({
 			method: ["" satisfies PaymentMethod, [Validators.required]],
-			mean: this.formBuilder.control<MeanOfPayment[]>([]),
 		}),
 		consents: this.formBuilder.group(
 			{
@@ -102,8 +98,9 @@ export class NewRegistrationComponent implements OnInit {
 			},
 			{ validators: consentsMandatory },
 		),
+		comments: ["", [Validators.maxLength(500)]],
 		audit: this.formBuilder.group({
-			createdAt: [{ value: new Date().toISOString(), disabled: true }],
+			createdAt: [{ value: new Date(), disabled: true }],
 			createdBy: [{ value: this.auth.currentUser!.displayName!, disabled: true }],
 			updatedAt: [{ value: "", disabled: true }],
 			updatedBy: [{ value: "", disabled: true }],
@@ -168,38 +165,24 @@ export class NewRegistrationComponent implements OnInit {
 		});
 
 		this.addActivity();
-
-		effect(() => {
-			const values = this.activities.controls.map((g) => g.getRawValue()) as {
-				category: string;
-				forfait: string;
-				teacher: string;
-				price: number;
-			}[];
-			const nb = values.length;
-			const somme = values.reduce((acc, v) => acc + (Number(v.price) || 0), 0);
-			const remise = nb >= this.discountThreshold ? Math.round(somme * this.discountRate) : 0;
-			const total = this.subscriptionCost + somme - remise;
-			this.nbActivities.set(nb);
-			this.totalActivities.set(somme);
-			this.discount.set(remise);
-			this.total.set(total);
-		});
+		this.updateTotals();
 	}
 
 	protected addActivity() {
 		this.activities.push(
 			this.formBuilder.group({
 				id: ["", Validators.required],
-				forfait: ["", Validators.required],
+				forfait: [{ value: "", disabled: true }, [Validators.required]],
 				teacher: ["", Validators.required],
 				price: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
 			}),
 		);
+		this.updateTotals();
 	}
 
 	protected removeActivity(index: number) {
 		this.activities.removeAt(index);
+		this.updateTotals();
 	}
 
 	protected onSubmit(): void {
@@ -207,6 +190,8 @@ export class NewRegistrationComponent implements OnInit {
 			this.registrationForm.markAsTouched();
 			return;
 		}
+
+		console.log(this.rawValuesToFirestoreData());
 	}
 
 	protected goBack() {
@@ -219,6 +204,7 @@ export class NewRegistrationComponent implements OnInit {
 				rejectLabel: "Non",
 				rejectButtonStyleClass: "p-button-secondary",
 				accept: () => {
+					this.onCancel();
 					window.history.back();
 				},
 			});
@@ -239,22 +225,47 @@ export class NewRegistrationComponent implements OnInit {
 		return age;
 	}
 
-	protected onActivityChange(index: number) {
-		const g = this.activities.at(index);
-		g.patchValue({ forfait: "", price: 0 });
+	protected onActivityChange(activity: FormGroup) {
+		activity.patchValue({ forfait: "", price: 0 });
+		if (activity.get("id")?.value !== "") {
+			activity.get("forfait")?.enable();
+		}
 	}
 
-	forfaitsForActivity(index: number): ActivityOption[] | null {
+	protected forfaitsForActivity(index: number): ActivityOption[] | null {
 		const cat = this.activities.at(index).get("id")?.value as string;
 		const found = this.catalog.find((c) => c.id === cat);
 		return found ? found.options : null;
 	}
 
-	protected onForfaitChange(index: number) {
-		const controlActivity = this.activities.at(index);
-		const activityId = controlActivity.get("id")?.value as string;
-		const forfait = controlActivity.get("forfait")?.value as string;
-		const opt = this.catalog.find((c) => c.id === activityId)?.options.find((o) => o.label === forfait);
-		controlActivity.get("price")?.setValue(opt?.price ?? 0, { emitEvent: false });
+	protected onForfaitChange(activity: FormGroup) {
+		const activityId = activity.get("id")?.value as string;
+		const forfait = activity.get("forfait")?.value as string;
+		const opt = this.catalog
+			.find((c) => c.id === activityId)
+			?.options.find((o: { label: string }) => o.label === forfait);
+		activity.get("price")?.setValue(opt?.price ?? 0, { emitEvent: false });
+		this.updateTotals();
+	}
+
+	private updateTotals() {
+		const activities = this.activities.controls;
+		this.nbActivities.set(activities.length);
+		this.totalActivities.set(activities.reduce((total, activity) => total + (activity.get("price")?.value ?? 0), 0));
+		this.discount.set(this.nbActivities() >= this.discountThreshold ? this.totalActivities() * this.discountRate : 0);
+		this.total.set(this.subscriptionCost + this.totalActivities() - this.discount());
+	}
+
+	private onCancel() {
+		this.registrationForm.reset();
+		this.activities.clear();
+		this.addActivity();
+		this.updateTotals();
+		this.hasData = false;
+	}
+
+	private rawValuesToFirestoreData(): SubscriberAtazik {
+		const rawValues = this.registrationForm.getRawValue();
+		return subscriberFromFormRegistration(rawValues);
 	}
 }

@@ -16,6 +16,11 @@
 	<p-toolbar>
 		<ng-template #start>
 			<p-button pRipple icon="pi pi-times" label="Annuler" severity="secondary" (onClick)="goBack()"/>
+			<p-chip
+				icon="pi pi-money-bill"
+				class="margin-l2"
+				label="Montant total : {{ totalActivities() | currency:'EUR':'symbol':'1.0-0' }}">
+			</p-chip>
 		</ng-template>
 
 		<ng-template #end>
@@ -47,7 +52,7 @@
 					</span>
 				</p-accordion-header>
 				<p-accordion-content formGroupName="student">
-					<p class="margin-4">
+					<p class="margin-b2">
 						Cette section vous permet de saisir les informations d'identité de l'élève.
 					</p>
 					<div class="input-row">
@@ -81,11 +86,11 @@
 				<p-accordion-content formGroupName="responsible">
 					<p class="margin-b1">Cette section vous permet de saisir les informations légal de l'élève ou
 						de son responsable légal.</p>
-					<div class="checkbox-container margin-4">
+					<div class="checkbox-container margin-b2">
 						<p-checkbox formControlName="isStudentResponsible" binary="true" inputId="student-is-responsible"/>
 						<label for="student-is-responsible">L'élève est son propre responsable légal</label>
 					</div>
-					<div class="input-row margin-4">
+					<div class="input-row margin-b2">
 						<p-floatlabel>
 							<label for="responsibleFirstName">Prénom</label>
 							<input id="responsibleFirstName" pInputText formControlName="firstName" placeholder="Jane" required/>
@@ -135,22 +140,49 @@
 					</span>
 				</p-accordion-header>
 				<p-accordion-content formArrayName="activities">
-					<p class="margin-4">Cette section vous permet de sélectionner les activités auxquelles l'élève
+					<p class="margin-b2">Cette section vous permet de sélectionner les activités auxquelles l'élève
 						souhaite participer.<br>Vous pouvez choisir plusieurs activités.</p>
-					@for (activity of activities.controls; let index = $index; track $index) {
+					@for (activity of activities.controls; track activity; let index = $index; ) {
 						<div class="input-row margin-b1" [formGroupName]="index">
-							<p-select formControlName="id" inputId="{{ index }}-activity"
+							<p-select formControlName="id"
 												placeholder="Choisir une activité"
 												[options]="catalog" optionLabel="name"
-												optionValue="id" required (onChange)="onActivityChange(index)"/>
-							<p-select formControlName="forfait" inputId="{{ index }}-forfait"
-												placeholder="Forfait"
-												[options]="forfaitsForActivity(index)!" optionLabel="label"
-												optionValue="value" [disabled]="activity.get('id')!.value === ''" required/>
+												optionValue="id" required (onChange)="onActivityChange(activity)"/>
+
+							<p-select
+								formControlName="forfait"
+								placeholder="Forfait"
+								[options]="forfaitsForActivity(index)!" optionLabel="label"
+								optionValue="label"
+								(onChange)="onForfaitChange(activity)"
+								required
+							/>
+
+							<p-floatlabel>
+								<label [for]="index+'-teacher'">Intervenant souhaité</label>
+								<input pInputText formControlName="teacher" [id]="index+'-teacher'"
+											 placeholder="Jeremy"/>
+							</p-floatlabel>
 
 							<p-button icon="pi pi-trash" severity="danger"
 												[disabled]="activities.length === 1"
 												(click)="removeActivity(index)"/>
+
+							<div class="activity-recap">
+								@if (activity.get('id')?.value === '') {
+									<p-message severity="warn">
+										Veuillez sélectionner une activité.
+									</p-message>
+								} @else if (activity.get('forfait')?.value === '') {
+									<p-message severity="warn">
+										Veuillez sélectionner un forfait pour l'activité.
+									</p-message>
+								} @else {
+									<p-message severity="info">
+										+ {{ activity.get('price')?.value | currency:'EUR':'symbol':'1.0-0' }}
+									</p-message>
+								}
+							</div>
 						</div>
 					}
 					<p-button icon="pi pi-plus" label="Ajouter une activité" class="margin-b1"
@@ -202,7 +234,7 @@
 					</span>
 				</p-accordion-header>
 				<p-accordion-content formGroupName="consents">
-					<p class="margin-4">Cette section vous permet de saisir les informations de consentements
+					<p class="margin-b2">Cette section vous permet de saisir les informations de consentements
 						relatives à l'adhésion de l'élève.</p>
 					<div class="checkbox-container margin-b1">
 						<p-checkbox formControlName="imageRight" binary="true" inputId="imageRight"/>
@@ -230,6 +262,35 @@
 							Je suis prêt à aider lors d'un événement de l'association pour aider à son bon fonctionnement.
 						</label>
 					</div>
+				</p-accordion-content>
+			</p-accordion-panel>
+
+			<p-accordion-panel value="5">
+				<p-accordion-header>
+					<span>
+							<i class="pi pi-info-circle text-info"></i>
+						6. Récapitulatif et commentaires
+					</span>
+				</p-accordion-header>
+				<p-accordion-content>
+					<p class="margin-b1">
+						Cette section donne un récapitulatif du coût total et permet de saisir des commentaires supplémentaires si
+						nécessaire.
+					</p>
+					@if (registrationForm.get("activities")!.invalid) {
+						<p-message severity="warn">
+							Veuillez sélectionner au moins une activité pour l'élève avant d'afficher le coût total.
+						</p-message>
+					} @else {
+						<p>
+							Le coût total de l'inscription est de <strong>{{ total() | currency:'EUR':'symbol':'1.0-0' }}</strong>.
+						</p>
+					}
+					<p-floatlabel class="margin-t2">
+						<label for="comments">Commentaires</label>
+						<textarea id="comments" pTextarea formControlName="comments" rows="3"
+											placeholder="Commentaires ou informations supplémentaires..." [autoResize]="true"></textarea>
+					</p-floatlabel>
 				</p-accordion-content>
 			</p-accordion-panel>
 		</p-accordion>

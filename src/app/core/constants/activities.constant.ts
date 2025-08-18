@@ -1,4 +1,4 @@
-import { ActivityCategory } from "../../features/app/new-registration/new-registration.component";
+import { ActivityCategory } from "../models/activity-category.model";
 
 export const ACTIVITIES_CATALOG: ActivityCategory[] = [
 	{
