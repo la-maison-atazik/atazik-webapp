@@ -22,7 +22,7 @@ import { ChipModule } from "primeng/chip";
 import { Textarea } from "primeng/textarea";
 import { Firestore } from "@angular/fire/firestore";
 import { ActivityOption } from "../../../core/models/activity-option.model";
-import { SubscriberAtazik, subscriberFromFormRegistration } from "../../../core/models/subscriber.model";
+import { subscriberFromFormRegistration } from "../../../core/models/subscriber.model";
 
 export type PaymentMethod = "" | "1x" | "3x" | "10x";
 export type MeanOfPayment = "virement" | "cheque" | "ancv" | "chequier_jeune";
@@ -69,6 +69,8 @@ export class NewRegistrationComponent implements OnInit {
 
 	protected hasData = false;
 
+	protected formControlMeanOfPayment = this.formBuilder.control<MeanOfPayment[]>([]);
+
 	protected registrationForm = this.formBuilder.group({
 		student: this.formBuilder.group({
 			firstName: ["", [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -87,6 +89,7 @@ export class NewRegistrationComponent implements OnInit {
 		}),
 		activities: this.formBuilder.array([] satisfies FormGroup[]),
 		payment: this.formBuilder.group({
+			meanOfPayment: this.formControlMeanOfPayment,
 			method: ["" satisfies PaymentMethod, [Validators.required]],
 		}),
 		consents: this.formBuilder.group(
@@ -191,7 +194,7 @@ export class NewRegistrationComponent implements OnInit {
 			return;
 		}
 
-		console.log(this.rawValuesToFirestoreData());
+		console.log(subscriberFromFormRegistration(this.registrationForm.getRawValue()));
 	}
 
 	protected goBack() {
@@ -262,10 +265,5 @@ export class NewRegistrationComponent implements OnInit {
 		this.addActivity();
 		this.updateTotals();
 		this.hasData = false;
-	}
-
-	private rawValuesToFirestoreData(): SubscriberAtazik {
-		const rawValues = this.registrationForm.getRawValue();
-		return subscriberFromFormRegistration(rawValues);
 	}
 }

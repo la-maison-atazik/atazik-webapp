@@ -210,15 +210,16 @@
 						<p-select inputId="paymentMethod" formControlName="method" placeholder="Choisir un mode de paiement"
 											[options]="paymentMethods" optionLabel="label" optionValue="value" required/>
 					</div>
-					<p class="description-mean-payment">Les informations ci-dessous sont données à titre indicatif.</p>
-					@for (meanOfPayment of meanOfPaymentOptions; track meanOfPayment.value) {
-						<div class="checkbox-container">
-							<p-checkbox binary="true" inputId="{{ meanOfPayment.value }}" readonly [disabled]="true"/>
-							<label for="{{ meanOfPayment.value }}">
-								{{ meanOfPayment.label }}
-							</label>
-						</div>
-					}
+					<p class="description-mean-payment">Les informations ci-dessous sont données à titre prévisionnelle.</p>
+					<div class="input-row">
+						@for (meanOfPayment of meanOfPaymentOptions; track meanOfPayment.value) {
+							<div class="checkbox-container">
+								<p-checkbox [value]="meanOfPayment.value" [inputId]="meanOfPayment.value"
+														[formControl]="formControlMeanOfPayment"/>
+								<label [for]="meanOfPayment.value">{{ meanOfPayment.label }}</label>
+							</div>
+						}
+					</div>
 				</p-accordion-content>
 			</p-accordion-panel>
 
@@ -282,14 +283,36 @@
 							Veuillez sélectionner au moins une activité pour l'élève avant d'afficher le coût total.
 						</p-message>
 					} @else {
-						<p>
-							Le coût total de l'inscription est de <strong>{{ total() | currency:'EUR':'symbol':'1.0-0' }}</strong>.
+						<div class="cost-container">
+							<p>Détails et récapitulatif du coût prévisionnel :</p>
+							<p-chip
+								label="Frais d'adhésion : {{ subscriptionCost | currency:'EUR':'symbol':'1.0-0' }}"/>
+							<span>+</span>
+							<p-chip
+								label="Coût total des activités : {{ totalActivities() | currency:'EUR':'symbol':'1.0-0' }}"/>
+							@if (discount() > 0) {
+								<span>-</span>
+								<p-chip label="Réduction appliquée : {{ discount() | currency:'EUR':'symbol':'1.0-0' }}"/>
+							}
+							<span>=</span>
+							<p-chip class="bg-blue"
+											label="Coût total de l'inscription : {{ total() | currency:'EUR':'symbol':'1.0-0' }}"/>
+						</div>
+						<p class="text-secondary margin-b1">
+							Calcul sans réduction : 10 euros de frais d'adhésion + coût total des activités<br>
+							Calcul avec réduction : 10 euros de frais d'adhésion + (coût total des activités * 0.96)<br>
+							(Réduction de 4% sur le total des activités à partir de 3 activités dans la même famille)
 						</p>
+						<p>Le coût total affiché est calculé selon l'inscription en cours. Si d'autres activités sont à la charges
+							du représentant légal (activité dans la même famille), des réductions supplémentaires peuvent
+							s'appliquer. Pour obtenir le coût réel veuillez vous rendre sur la page des <a>détails du responsable
+								légal.</a></p>
 					}
 					<p-floatlabel class="margin-t2">
 						<label for="comments">Commentaires</label>
 						<textarea id="comments" pTextarea formControlName="comments" rows="3"
-											placeholder="Commentaires ou informations supplémentaires..." [autoResize]="true"></textarea>
+											placeholder="Commentaires ou informations supplémentaires..." [autoResize]="true"
+											maxlength="500"></textarea>
 					</p-floatlabel>
 				</p-accordion-content>
 			</p-accordion-panel>

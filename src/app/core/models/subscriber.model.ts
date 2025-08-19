@@ -1,5 +1,7 @@
 import { Responsible } from "./responsible.model";
 import { Activity } from "./activity.models";
+import { PaymentMethod } from "./types/payment-method.type";
+import { MeonOfPayment } from "./types/mean-of-payment.type";
 
 export interface SubscriberAtazik {
 	uid?: string;
@@ -15,8 +17,8 @@ export interface SubscriberAtazik {
 		helpEvent: boolean;
 	};
 	activities: Activity[];
-	paymentMethod?: "1x" | "3x" | "10x";
-	meanOfPayment?: "virement" | "cheque" | "ancv" | "chequier_jeune";
+	paymentMethod?: PaymentMethod;
+	meanOfPayment?: MeonOfPayment[];
 	comments?: string;
 	createdAt: Date;
 	updatedAt?: Date;
@@ -54,6 +56,7 @@ export function subscriberFromFormRegistration(
 			helpEvent: form.consents.helpEvent || false,
 		},
 		activities: form.activities || [],
+		meanOfPayment: form.payment.meanOfPayment || [],
 		paymentMethod: form.payment.method || "1x",
 		comments: form.comments || "",
 		createdAt: form.audit.createdAt || new Date(),
