@@ -20,6 +20,8 @@ export class StudentTableComponent implements OnInit {
 	private unSelectedRow?: StudentRow;
 
 	public ngOnInit(): void {
+		this.unSelectedRow = undefined;
+		this.selectedRow = undefined;
 		this.studentService.studentList$.subscribe((responsibleList) => {
 			this.data = mapStudentsToRows(responsibleList);
 		});

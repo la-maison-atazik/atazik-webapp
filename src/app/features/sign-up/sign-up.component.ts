@@ -26,6 +26,7 @@ import { getUserRoleLabel } from "@shared/utils/user-role.utils";
 import { UserInvite } from "@shared/models/user-invite.model";
 import { matchFields } from "../../shared/validators/password-confirm.validator";
 import { FirestoreCollectionsEnum } from "@shared/enums/firebase/firestore-collections.enum";
+import { PASSWORD } from "../../core/constants/regex.constant";
 
 @Component({
 	selector: "app-sign-up",
@@ -68,8 +69,8 @@ export class SignUpComponent implements OnInit {
 			lastName: ["", { validators: [Validators.required] }],
 			role: ["", { validators: [Validators.required] }],
 			email: ["", { validators: [Validators.required, Validators.email] }],
-			password: ["", { validators: [Validators.required] }],
-			confirmPassword: ["", { validators: [Validators.required] }],
+			password: ["", { validators: [Validators.required, Validators.pattern(PASSWORD)] }],
+			confirmPassword: ["", { validators: [Validators.required, Validators.pattern(PASSWORD)] }],
 		},
 		{
 			validators: [matchFields("password", "confirmPassword", "passwordMismatch")],

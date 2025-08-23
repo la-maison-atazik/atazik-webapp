@@ -4,7 +4,6 @@ import { calculateAgeFromTimestamp } from "@shared/utils/age.utils";
 import { Timestamp } from "firebase/firestore";
 
 export function mapStudentToRow(student: Student): StudentRow {
-	console.log(student);
 	return {
 		uid: student.uid,
 		displayName: `${student.firstName} ${student.lastName}`,

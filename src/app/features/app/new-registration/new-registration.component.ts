@@ -24,7 +24,6 @@ import { ActivityOption } from "../../../core/models/activity-option.model";
 import { studentFromFormRegistration } from "../../../core/models/student.model";
 import { calculateAge } from "@shared/utils/age.utils";
 import { FirestoreCollectionsEnum } from "@shared/enums/firebase/firestore-collections.enum";
-import { Router } from "@angular/router";
 
 export type PaymentMethod = "" | "1x" | "3x" | "10x";
 export type MeanOfPayment = "virement" | "cheque" | "ancv" | "chequier_jeune";
@@ -59,7 +58,6 @@ export class NewRegistrationComponent implements OnInit {
 	private formBuilder = inject(FormBuilder);
 	private auth = inject(Auth);
 	private firestore = inject(Firestore);
-	private router = inject(Router);
 
 	// Paramètres
 	protected readonly subscriptionCost = 10; // €
@@ -71,6 +69,8 @@ export class NewRegistrationComponent implements OnInit {
 	protected hasData = false;
 	protected loading = false;
 
+	protected currentYearString = "";
+
 	protected formControlMeanOfPayment = this.formBuilder.control<MeanOfPayment[]>([]);
 
 	protected registrationForm = this.formBuilder.group({
@@ -79,6 +79,7 @@ export class NewRegistrationComponent implements OnInit {
 			lastName: ["", [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
 			birthDate: [null, [Validators.required]],
 		}),
+		currentYear: [{ value: "", disabled: true }],
 		responsible: this.formBuilder.group({
 			isStudentResponsible: [false],
 			firstName: ["", [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -141,7 +142,23 @@ export class NewRegistrationComponent implements OnInit {
 
 	public ngOnInit() {
 		this.registrationForm.valueChanges.subscribe((values) => {
-			this.hasData = Object.values(values).some((val) => val && val.toString().trim() !== "");
+			this.hasData = Object.values(values).some((val) => {
+				// Handle nested objects and arrays
+				if (typeof val === "object" && val !== null) {
+					return Object.values(val).some((nestedVal) => {
+						if (Array.isArray(nestedVal)) {
+							return nestedVal.length > 0;
+						} else if (typeof nestedVal === "object" && nestedVal !== null) {
+							return Object.values(nestedVal).some(
+								(deepNestedVal) => deepNestedVal && deepNestedVal.toString().trim() !== "",
+							);
+						} else {
+							return nestedVal && nestedVal.toString().trim() !== "";
+						}
+					});
+				}
+				return val && val.toString().trim() !== "";
+			});
 		});
 
 		this.registrationForm.get("student.birthDate")?.valueChanges.subscribe((birthDate) => {
@@ -171,6 +188,16 @@ export class NewRegistrationComponent implements OnInit {
 
 		this.addActivity();
 		this.updateTotals();
+
+		// Définition de l'année en cours pour cette inscription
+		// Si après août, on est dans la nouvelle année scolaire donc on ajoute 1
+		const currentYear = new Date().getFullYear();
+		this.currentYearString = currentYear.toString();
+		if (new Date().getMonth() >= 7) {
+			this.currentYearString = this.currentYearString + "/" + (currentYear + 1);
+		} else {
+			this.currentYearString = currentYear - 1 + "/" + currentYear;
+		}
 	}
 
 	protected addActivity() {
@@ -196,11 +223,12 @@ export class NewRegistrationComponent implements OnInit {
 			return;
 		}
 
+		this.registrationForm.patchValue({ currentYear: this.currentYearString });
+
 		this.loading = true;
 
 		const student = studentFromFormRegistration(this.registrationForm.getRawValue());
 		const collectionRef = collection(this.firestore, FirestoreCollectionsEnum.STUDENT);
-		console.log(student);
 		addDoc(collectionRef, student)
 			.then(() => {
 				this.messageService.add({

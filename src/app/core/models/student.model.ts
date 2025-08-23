@@ -10,6 +10,7 @@ export interface Student {
 	firstName: string;
 	birthDate: Date | Timestamp;
 	isStudentResponsible: boolean;
+	currentYear: string;
 	responsible: Responsible;
 	consents: {
 		insuranceRC: boolean;
@@ -33,6 +34,7 @@ export function studentFromFormRegistration(form: any): StudentNoUid {
 		firstName: form.student.firstName,
 		birthDate: form.student.birthDate ? new Date(form.student.birthDate) : new Date(),
 		isStudentResponsible: form.responsible.isStudentResponsible,
+		currentYear: form.currentYear,
 		responsible: {
 			firstName: form.responsible.firstName,
 			lastName: form.responsible.lastName,

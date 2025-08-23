@@ -19,6 +19,9 @@
 				class="margin-l2"
 				label="Montant total : {{ totalActivities() | currency:'EUR':'symbol':'1.0-0' }}">
 			</p-chip>
+			<p-message class="margin-l1" severity="info">
+				Inscription pour l'année {{ currentYearString }}
+			</p-message>
 		</ng-template>
 
 		<ng-template #end>
