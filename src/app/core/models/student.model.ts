@@ -2,12 +2,13 @@ import { Responsible } from "./responsible.model";
 import { Activity } from "./activity.models";
 import { PaymentMethod } from "./types/payment-method.type";
 import { MeonOfPayment } from "./types/mean-of-payment.type";
+import { Timestamp } from "firebase/firestore";
 
-export interface SubscriberAtazik {
+export interface Student {
 	uid?: string;
 	lastName: string;
 	firstName: string;
-	birthDate: Date;
+	birthDate: Date | Timestamp;
 	isStudentResponsible: boolean;
 	responsible: Responsible;
 	consents: {
@@ -26,19 +27,13 @@ export interface SubscriberAtazik {
 	updatedBy?: string;
 }
 
-export function subscriberFromFormRegistration(
-	form: any,
-	subscriberId?: string,
-	responsibleId?: string,
-): SubscriberAtazik {
+export function studentFromFormRegistration(form: any): StudentNoUid {
 	return {
-		uid: subscriberId || undefined,
 		lastName: form.student.lastName,
 		firstName: form.student.firstName,
 		birthDate: form.student.birthDate ? new Date(form.student.birthDate) : new Date(),
 		isStudentResponsible: form.responsible.isStudentResponsible,
 		responsible: {
-			uid: responsibleId || undefined,
 			firstName: form.responsible.firstName,
 			lastName: form.responsible.lastName,
 			email: form.responsible.email,
@@ -63,3 +58,5 @@ export function subscriberFromFormRegistration(
 		createdBy: form.audit.createdBy,
 	};
 }
+
+export type StudentNoUid = Omit<Student, "uid">;

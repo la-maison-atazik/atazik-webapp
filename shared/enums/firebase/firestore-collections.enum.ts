@@ -11,4 +11,16 @@ export const enum FirestoreCollectionsEnum {
 	 * This collection is used to manage user invitations and track their status.
 	 */
 	PENDING_INVITES = "pendingInvites",
+
+	/**
+	 * Collection for storing all responsible.
+	 * Each document in this collection represents a responsible.
+	 */
+	RESPONSIBLE = "responsible",
+
+	/**
+	 * Collection for storing all subscribers.
+	 * Each document in this collection represents a student.
+	 */
+	STUDENT = "student",
 }

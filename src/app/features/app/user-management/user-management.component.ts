@@ -19,7 +19,6 @@ import { InviteUserDialogComponent } from "./invite-user-dialog/invite-user-dial
 import { UserInvite } from "@shared/models/user-invite.model";
 import { Tooltip } from "primeng/tooltip";
 import { EditRoleDialogComponent } from "./edit-role-dialog/edit-role-dialog.component";
-import { ConfirmDialog } from "primeng/confirmdialog";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { UserStatusEnum } from "@shared/enums/user-status.enum";
 import { isUserRoleEqualOrHigher } from "@shared/utils/user-role.utils";
@@ -45,10 +44,8 @@ import { ToastModule } from "primeng/toast";
 		AuthModule,
 		Tooltip,
 		EditRoleDialogComponent,
-		ConfirmDialog,
 		ToastModule,
 	],
-	providers: [ConfirmationService, MessageService],
 	templateUrl: "./user-management.component.html",
 	styleUrl: "./user-management.component.scss",
 })

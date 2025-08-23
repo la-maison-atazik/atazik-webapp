@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, signal } from "@angular/core";
-import { ConfirmDialog } from "primeng/confirmdialog";
 import { ToastModule } from "primeng/toast";
 import { ButtonModule } from "primeng/button";
 import { Ripple } from "primeng/ripple";
@@ -20,9 +19,12 @@ import { MessageModule } from "primeng/message";
 import { SelectModule } from "primeng/select";
 import { ChipModule } from "primeng/chip";
 import { Textarea } from "primeng/textarea";
-import { Firestore } from "@angular/fire/firestore";
+import { addDoc, collection, Firestore } from "@angular/fire/firestore";
 import { ActivityOption } from "../../../core/models/activity-option.model";
-import { subscriberFromFormRegistration } from "../../../core/models/subscriber.model";
+import { studentFromFormRegistration } from "../../../core/models/student.model";
+import { calculateAge } from "@shared/utils/age.utils";
+import { FirestoreCollectionsEnum } from "@shared/enums/firebase/firestore-collections.enum";
+import { Router } from "@angular/router";
 
 export type PaymentMethod = "" | "1x" | "3x" | "10x";
 export type MeanOfPayment = "virement" | "cheque" | "ancv" | "chequier_jeune";
@@ -31,7 +33,6 @@ export type MeanOfPayment = "virement" | "cheque" | "ancv" | "chequier_jeune";
 	selector: "app-new-registration",
 	imports: [
 		CommonModule,
-		ConfirmDialog,
 		ToastModule,
 		ButtonModule,
 		Ripple,
@@ -49,7 +50,6 @@ export type MeanOfPayment = "virement" | "cheque" | "ancv" | "chequier_jeune";
 		ChipModule,
 		Textarea,
 	],
-	providers: [ConfirmationService, MessageService],
 	templateUrl: "./new-registration.component.html",
 	styleUrl: "./new-registration.component.scss",
 })
@@ -59,6 +59,7 @@ export class NewRegistrationComponent implements OnInit {
 	private formBuilder = inject(FormBuilder);
 	private auth = inject(Auth);
 	private firestore = inject(Firestore);
+	private router = inject(Router);
 
 	// Paramètres
 	protected readonly subscriptionCost = 10; // €
@@ -68,6 +69,7 @@ export class NewRegistrationComponent implements OnInit {
 	protected readonly catalog = ACTIVITIES_CATALOG;
 
 	protected hasData = false;
+	protected loading = false;
 
 	protected formControlMeanOfPayment = this.formBuilder.control<MeanOfPayment[]>([]);
 
@@ -144,7 +146,7 @@ export class NewRegistrationComponent implements OnInit {
 
 		this.registrationForm.get("student.birthDate")?.valueChanges.subscribe((birthDate) => {
 			if (birthDate) {
-				const age = this.calculateAge(birthDate);
+				const age = calculateAge(birthDate);
 				this.registrationForm.patchValue({
 					responsible: {
 						isStudentResponsible: age >= 18,
@@ -194,11 +196,34 @@ export class NewRegistrationComponent implements OnInit {
 			return;
 		}
 
-		console.log(subscriberFromFormRegistration(this.registrationForm.getRawValue()));
+		this.loading = true;
+
+		const student = studentFromFormRegistration(this.registrationForm.getRawValue());
+		const collectionRef = collection(this.firestore, FirestoreCollectionsEnum.STUDENT);
+		console.log(student);
+		addDoc(collectionRef, student)
+			.then(() => {
+				this.messageService.add({
+					severity: "success",
+					summary: "Inscription réussie",
+					detail: `L'inscription de ${student.firstName} ${student.lastName} a été enregistrée avec succès.`,
+				});
+				this.goBack(true);
+				this.loading = false;
+			})
+			.catch((err) => {
+				console.error("Erreur lors de l'enregistrement de l'inscription :", err);
+				this.messageService.add({
+					severity: "error",
+					summary: "Erreur",
+					detail: "Une erreur est survenue lors de l'enregistrement de l'inscription. Veuillez réessayer.",
+				});
+				this.loading = false;
+			});
 	}
 
-	protected goBack() {
-		if (this.hasData) {
+	protected goBack(force = false): void {
+		if (this.hasData && !force) {
 			this.confirmationService.confirm({
 				message: "Vous avez des modifications non enregistrées. Voulez-vous vraiment revenir en arrière ?",
 				header: "Confirmation",
@@ -214,18 +239,6 @@ export class NewRegistrationComponent implements OnInit {
 		} else {
 			window.history.back();
 		}
-	}
-
-	protected calculateAge(birthDate: Date): number {
-		if (!birthDate) return 0;
-		const today = new Date();
-		let age = today.getFullYear() - birthDate.getFullYear();
-		const monthDiff = today.getMonth() - birthDate.getMonth();
-		const dayDiff = today.getDate() - birthDate.getDate();
-		if (monthDiff < 0 || (monthDiff === 0 && dayDiff > 0)) {
-			age--;
-		}
-		return age;
 	}
 
 	protected onActivityChange(activity: FormGroup) {

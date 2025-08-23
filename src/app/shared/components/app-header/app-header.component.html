@@ -1,6 +1,3 @@
-<p-toast/>
-<p-confirmDialog></p-confirmDialog>
-
 <header>
 	<h1>Atazik</h1>
 
@@ -9,9 +6,9 @@
 			<a routerLink="/app" routerLinkActive="active-link" aria-label="Accueil">
 				<span>Accueil</span>
 			</a>
-			<a routerLink="/app/subscriber-management" routerLinkActive="active-link"
-				 aria-label="Adhérents et responsables légaux">
-				<span>Adhérents et responsables légaux</span>
+			<a routerLink="/app/dashboard" routerLinkActive="active-link"
+				 aria-label="Tableau de bord">
+				<span>Tableau de bord</span>
 			</a>
 			@if (isPresidentOrHigher()) {
 				<a routerLink="/app/user-management" routerLinkActive="active-link" aria-label="Gestion des utilisateurs">

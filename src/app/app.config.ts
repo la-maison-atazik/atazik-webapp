@@ -11,6 +11,7 @@ import { providePrimeNG } from "primeng/config";
 import { customPreset } from "./core/constants/themes.constant";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import { getFunctions, provideFunctions } from "@angular/fire/functions";
+import { ConfirmationService, MessageService } from "primeng/api";
 
 let app: FirebaseApp | undefined;
 const region = "europe-west9"; // Paris
@@ -77,5 +78,7 @@ export const appConfig: ApplicationConfig = {
 				},
 			},
 		}),
+		MessageService,
+		ConfirmationService,
 	],
 };

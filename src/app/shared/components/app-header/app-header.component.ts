@@ -3,7 +3,6 @@ import { Auth, AuthModule } from "@angular/fire/auth";
 import { Router, RouterModule } from "@angular/router";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { ToastModule } from "primeng/toast";
-import { ConfirmDialog } from "primeng/confirmdialog";
 import { ButtonModule } from "primeng/button";
 import { isUserRoleEqualOrHigher } from "@shared/utils/user-role.utils";
 import { UserRoleEnum } from "@shared/enums/user-roles.enum";
@@ -11,8 +10,7 @@ import { ClaimService } from "../../../core/services/claim.service";
 
 @Component({
 	selector: "app-header",
-	imports: [AuthModule, RouterModule, ConfirmDialog, ToastModule, ButtonModule],
-	providers: [ConfirmationService, MessageService],
+	imports: [AuthModule, RouterModule, ToastModule, ButtonModule],
 	templateUrl: "./app-header.component.html",
 	styleUrl: "./app-header.component.scss",
 })

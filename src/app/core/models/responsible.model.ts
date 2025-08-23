@@ -1,5 +1,4 @@
 export interface Responsible {
-	uid?: string;
 	firstName: string;
 	lastName: string;
 	email: string;

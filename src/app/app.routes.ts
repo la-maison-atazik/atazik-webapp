@@ -8,7 +8,7 @@ import { roleGuard } from "./core/guards/role.guard";
 import { UserRoleEnum } from "@shared/enums/user-roles.enum";
 import { statusGuard } from "./core/guards/status.guard";
 import { UserStatusEnum } from "@shared/enums/user-status.enum";
-import { SubscriberManagementComponent } from "./features/app/subscriber-management/subscriber-management.component";
+import { DashboardComponent } from "./features/app/dashboard/dashboard.component";
 import { NewRegistrationComponent } from "./features/app/new-registration/new-registration.component";
 
 const redirectUnauthorizedToSignIn = () => redirectUnauthorizedTo(["/sign-in"]);
@@ -30,9 +30,9 @@ export const routes: Routes = [
 				title: "Atazik - Accueil",
 			},
 			{
-				path: "subscriber-management",
-				component: SubscriberManagementComponent,
-				title: "Atazik - Adhérents et responsables légaux",
+				path: "dashboard",
+				component: DashboardComponent,
+				title: "Atazik - Tableau de bord",
 			},
 			{
 				path: "new-registration",
