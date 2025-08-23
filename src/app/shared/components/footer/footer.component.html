@@ -1,0 +1,9 @@
+<footer>
+	<p>© {{ currentYear }} Atazik. All rights reserved.</p>
+	@if (isTestEnvironment) {
+		<p-message severity="contrast">
+			<i class="pi pi-exclamation-triangle margin-r1"></i>
+			Attention : Application de TEST ne pas utiliser de données réelles !
+		</p-message>
+	}
+</footer>

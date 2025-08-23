@@ -11,10 +11,10 @@ import { ClaimService } from "../../../core/services/claim.service";
 @Component({
 	selector: "app-header",
 	imports: [AuthModule, RouterModule, ToastModule, ButtonModule],
-	templateUrl: "./app-header.component.html",
-	styleUrl: "./app-header.component.scss",
+	templateUrl: "./header.component.html",
+	styleUrl: "./header.component.scss",
 })
-export class AppHeaderComponent {
+export class HeaderComponent {
 	private roleService = inject(ClaimService);
 	protected auth = inject(Auth);
 	private router = inject(Router);
