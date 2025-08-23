@@ -1,4 +1,3 @@
-import { Responsible } from "./responsible.model";
 import { Activity } from "./activity.models";
 import { PaymentMethod } from "./types/payment-method.type";
 import { MeonOfPayment } from "./types/mean-of-payment.type";
@@ -10,8 +9,7 @@ export interface Student {
 	firstName: string;
 	birthDate: Date | Timestamp;
 	isStudentResponsible: boolean;
-	currentYear: string;
-	responsible: Responsible;
+	responsible: string;
 	consents: {
 		insuranceRC: boolean;
 		internalRules: boolean;
@@ -28,24 +26,13 @@ export interface Student {
 	updatedBy?: string;
 }
 
-export function studentFromFormRegistration(form: any): StudentNoUid {
+export function studentFromFormRegistration(form: any, responsibleUid: string): StudentNoUid {
 	return {
 		lastName: form.student.lastName,
 		firstName: form.student.firstName,
 		birthDate: form.student.birthDate ? new Date(form.student.birthDate) : new Date(),
+		responsible: responsibleUid,
 		isStudentResponsible: form.responsible.isStudentResponsible,
-		currentYear: form.currentYear,
-		responsible: {
-			firstName: form.responsible.firstName,
-			lastName: form.responsible.lastName,
-			email: form.responsible.email,
-			phone: form.responsible.phone,
-			address: form.responsible.address,
-			city: form.responsible.city,
-			postalCode: form.responsible.postalCode,
-			createdAt: form.audit.createdAt || new Date(),
-			createdBy: form.audit.createdBy,
-		},
 		consents: {
 			insuranceRC: form.consents.insuranceRC || false,
 			internalRules: form.consents.internalRules || false,

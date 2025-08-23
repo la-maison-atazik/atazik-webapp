@@ -24,6 +24,7 @@ import { ActivityOption } from "../../../core/models/activity-option.model";
 import { studentFromFormRegistration } from "../../../core/models/student.model";
 import { calculateAge } from "@shared/utils/age.utils";
 import { FirestoreCollectionsEnum } from "@shared/enums/firebase/firestore-collections.enum";
+import { responsibleFromFormRegistration } from "../../../core/models/responsible.model";
 
 export type PaymentMethod = "" | "1x" | "3x" | "10x";
 export type MeanOfPayment = "virement" | "cheque" | "ancv" | "chequier_jeune";
@@ -79,7 +80,6 @@ export class NewRegistrationComponent implements OnInit {
 			lastName: ["", [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
 			birthDate: [null, [Validators.required]],
 		}),
-		currentYear: [{ value: "", disabled: true }],
 		responsible: this.formBuilder.group({
 			isStudentResponsible: [false],
 			firstName: ["", [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -194,9 +194,9 @@ export class NewRegistrationComponent implements OnInit {
 		const currentYear = new Date().getFullYear();
 		this.currentYearString = currentYear.toString();
 		if (new Date().getMonth() >= 7) {
-			this.currentYearString = this.currentYearString + "/" + (currentYear + 1);
+			this.currentYearString = this.currentYearString + "-" + (currentYear + 1);
 		} else {
-			this.currentYearString = currentYear - 1 + "/" + currentYear;
+			this.currentYearString = currentYear - 1 + "-" + currentYear;
 		}
 	}
 
@@ -217,19 +217,38 @@ export class NewRegistrationComponent implements OnInit {
 		this.updateTotals();
 	}
 
-	protected onSubmit(): void {
+	protected async onSubmit(): Promise<void> {
 		if (this.registrationForm.invalid) {
 			this.registrationForm.markAsTouched();
 			return;
 		}
 
-		this.registrationForm.patchValue({ currentYear: this.currentYearString });
-
 		this.loading = true;
 
-		const student = studentFromFormRegistration(this.registrationForm.getRawValue());
-		const collectionRef = collection(this.firestore, FirestoreCollectionsEnum.STUDENT);
-		addDoc(collectionRef, student)
+		// Envoi / définition du responsable
+		const responsible = responsibleFromFormRegistration(this.registrationForm.get("responsible")?.getRawValue());
+		const responsibleCollectionRef = collection(this.firestore, FirestoreCollectionsEnum.RESPONSIBLE);
+		let uidResponsible = "";
+		try {
+			uidResponsible = (await addDoc(responsibleCollectionRef, responsible)).id;
+		} catch (err) {
+			console.error("Erreur lors de l'enregistrement du responsable :", err);
+			this.messageService.add({
+				severity: "error",
+				summary: "Erreur",
+				detail: "Une erreur est survenue lors de l'enregistrement du responsable. Veuillez réessayer.",
+			});
+			this.loading = false;
+			return;
+		}
+
+		// Envoi de l'étudiant
+		const student = studentFromFormRegistration(this.registrationForm.getRawValue(), uidResponsible);
+		const studentCollectionRef = collection(
+			this.firestore,
+			FirestoreCollectionsEnum.STUDENT + "/" + this.currentYearString,
+		);
+		addDoc(studentCollectionRef, student)
 			.then(() => {
 				this.messageService.add({
 					severity: "success",

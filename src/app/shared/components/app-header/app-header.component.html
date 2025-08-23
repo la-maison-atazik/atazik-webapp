@@ -3,7 +3,8 @@
 
 	@if (auth.currentUser && !isSignUpUrl) {
 		<nav>
-			<a routerLink="/app" routerLinkActive="active-link" aria-label="Accueil">
+			<a routerLink="/app/home" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link"
+				 aria-label="Accueil">
 				<span>Accueil</span>
 			</a>
 			<a routerLink="/app/dashboard" routerLinkActive="active-link"
