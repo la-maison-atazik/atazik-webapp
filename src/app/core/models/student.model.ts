@@ -26,6 +26,7 @@ export interface Student {
 	updatedBy?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function studentFromFormRegistration(form: any, responsibleUid: string): StudentNoUid {
 	return {
 		lastName: form.student.lastName.trim(),

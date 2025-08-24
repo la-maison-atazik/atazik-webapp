@@ -17,6 +17,7 @@ export type PartialResponsible = Partial<Responsible>;
 
 export type ResponsibleNoUid = Omit<Responsible, "uid">;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function responsibleFromFormRegistration(form: any): ResponsibleNoUid {
 	return {
 		firstName: form.responsible.firstName.trim(),
