@@ -18,7 +18,7 @@ export class StudentService {
 	}
 
 	private listenToCollection() {
-		const ref = collection(this.firestore, FirestoreCollectionsEnum.STUDENT); // <-- your collection name
+		const ref = collection(this.firestore, FirestoreCollectionsEnum.STUDENT + "/2025-2026/records");
 		const studentList$: Observable<Student[]> = collectionData(ref, { idField: "uid" }) as Observable<Student[]>;
 
 		studentList$.subscribe((studentList) => {

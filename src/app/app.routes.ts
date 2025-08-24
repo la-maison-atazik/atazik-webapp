@@ -1,16 +1,15 @@
 import { Routes } from "@angular/router";
 import { SignInComponent } from "./features/sign-in/sign-in.component";
 import { AuthGuard, redirectUnauthorizedTo } from "@angular/fire/auth-guard";
-import { HomeComponent } from "./features/app/home/home.component";
 import { UserManagementComponent } from "./features/app/user-management/user-management.component";
 import { SignUpComponent } from "./features/sign-up/sign-up.component";
 import { roleGuard } from "./core/guards/role.guard";
 import { UserRoleEnum } from "@shared/enums/user-roles.enum";
 import { statusGuard } from "./core/guards/status.guard";
 import { UserStatusEnum } from "@shared/enums/user-status.enum";
+import { StudentViewComponent } from "./features/app/student-view/student-view.component";
 import { DashboardComponent } from "./features/app/dashboard/dashboard.component";
 import { NewRegistrationComponent } from "./features/app/new-registration/new-registration.component";
-import { StudentViewComponent } from "./features/app/student-view/student-view.component";
 
 const redirectUnauthorizedToSignIn = () => redirectUnauthorizedTo(["/sign-in"]);
 
@@ -23,12 +22,13 @@ export const routes: Routes = [
 			{
 				path: "",
 				pathMatch: "full",
-				redirectTo: "home",
+				redirectTo: "dashboard", // TODO change to 'home' when HomeComponent is ready
 			},
 			{
 				path: "home",
-				component: HomeComponent,
+				// component: HomeComponent,
 				title: "Atazik - Accueil",
+				redirectTo: "/app/dashboard",
 			},
 			{
 				path: "dashboard",
@@ -60,6 +60,6 @@ export const routes: Routes = [
 		component: SignUpComponent,
 		title: "Atazik - Inscription",
 	},
-	{ path: "", redirectTo: "app/home", pathMatch: "full" },
-	{ path: "**", redirectTo: "app/home" },
+	{ path: "", redirectTo: "/app/home", pathMatch: "full" },
+	{ path: "**", redirectTo: "/app/home" },
 ];
