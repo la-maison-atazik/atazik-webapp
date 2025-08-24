@@ -11,6 +11,7 @@ import { providePrimeNG } from "primeng/config";
 import { customPreset } from "./core/constants/themes.constant";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import { getFunctions, provideFunctions } from "@angular/fire/functions";
+import { ConfirmationService, MessageService } from "primeng/api";
 
 let app: FirebaseApp | undefined;
 const region = "europe-west9"; // Paris
@@ -48,8 +49,28 @@ export const appConfig: ApplicationConfig = {
 				emptyFilterMessage: "Aucun résultat trouvé",
 				emptySelectionMessage: "Aucune sélection",
 				emptySearchMessage: "Aucun résultat trouvé",
+				chooseDate: "Choisir une date",
+				chooseMonth: "Choisir un mois",
+				chooseYear: "Choisir une année",
+				monthNames: [
+					"Janvier",
+					"Février",
+					"Mars",
+					"Avril",
+					"Mai",
+					"Juin",
+					"Juillet",
+					"Août",
+					"Septembre",
+					"Octobre",
+					"Novembre",
+					"Décembre",
+				],
+				monthNamesShort: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jui", "Jui", "Aoû", "Sep", "Oct", "Nov", "Déc"],
+				dayNamesShort: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+				dayNamesMin: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
 			},
-			ripple: true,
+			ripple: false,
 			theme: {
 				preset: customPreset,
 				options: {
@@ -57,5 +78,7 @@ export const appConfig: ApplicationConfig = {
 				},
 			},
 		}),
+		MessageService,
+		ConfirmationService,
 	],
 };

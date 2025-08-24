@@ -1,12 +1,9 @@
-<p-toast/>
-<p-confirmDialog/>
-
-<div>
+<div class="page-header">
 	<h2>
 		<i class="title-icon pi pi-users"></i>
 		Gestion des utilisateurs
 	</h2>
-	<p class="page-description">
+	<p>
 		Cette page vous permet de gérer les utilisateurs de votre application. Vous pouvez inviter de nouveaux utilisateurs,
 		modifier leurs rôles et gérer l'état de leurs comptes.
 	</p>
@@ -22,7 +19,7 @@
 	>
 		<ng-template #caption>
 			<p-toolbar aria-label="Actions">
-				<ng-template #start class="half-width">
+				<ng-template #start>
 					<p-iconfield class="research-bar">
 						<p-inputicon class="pi pi-search"/>
 						<input pInputText type="text" (input)="dt2.filterGlobal($event.target!.value, 'contains')"
