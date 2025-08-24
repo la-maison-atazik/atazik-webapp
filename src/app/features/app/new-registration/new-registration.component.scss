@@ -10,10 +10,6 @@ p-toolbar, p-card {
 
 p-toolbar {
 	margin-block: 2rem 1rem;
-
-	div {
-		flex: 1;
-	}
 }
 
 .checkbox-container {
@@ -60,22 +56,9 @@ i {
 	color: #2f82f6;
 }
 
-p-toolbar p-message {
-	margin-right: 2rem;
-}
-
 .description-mean-payment {
 	margin-block: 1rem;
 	color: #a1a1aa;
-}
-
-.margin-l2 {
-	margin-left: 1rem;
-	padding-inline: 1rem;
-}
-
-.margin-l1 {
-	margin-left: 1rem;
 }
 
 .activity-recap {
@@ -100,7 +83,6 @@ textarea {
 .margin-t2 {
 	margin-top: 2rem;
 }
-
 
 .cost-container {
 	display: flex;

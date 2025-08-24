@@ -13,17 +13,19 @@ export interface Responsible {
 	updatedBy?: string;
 }
 
+export type PartialResponsible = Partial<Responsible>;
+
 export type ResponsibleNoUid = Omit<Responsible, "uid">;
 
 export function responsibleFromFormRegistration(form: any): ResponsibleNoUid {
 	return {
-		firstName: form.responsible.firstName,
-		lastName: form.responsible.lastName,
-		email: form.responsible.email,
-		phone: form.responsible.phone || "",
-		address: form.responsible.address || "",
-		city: form.responsible.city || "",
-		postalCode: form.responsible.postalCode || "",
+		firstName: form.responsible.firstName.trim(),
+		lastName: form.responsible.lastName.trim(),
+		email: form.responsible.email.trim(),
+		phone: form.responsible.phone.trim() || "",
+		address: form.responsible.address.trim() || "",
+		city: form.responsible.city.trim() || "",
+		postalCode: form.responsible.postalCode.trim() || "",
 		createdAt: form.audit.createdAt || new Date(),
 		createdBy: form.audit.createdBy,
 	};

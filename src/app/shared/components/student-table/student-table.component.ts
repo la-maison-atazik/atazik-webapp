@@ -3,6 +3,7 @@ import { StudentService } from "../../../core/services/student.service";
 import { StudentRow } from "../../../core/models/tables-row/student-row.model";
 import { mapStudentsToRows } from "../../../core/mappers/student-to-row.mapper";
 import { TableModule, TableRowSelectEvent, TableRowUnSelectEvent } from "primeng/table";
+import { Router } from "@angular/router";
 
 @Component({
 	selector: "app-student-table",
@@ -12,6 +13,7 @@ import { TableModule, TableRowSelectEvent, TableRowUnSelectEvent } from "primeng
 })
 export class StudentTableComponent implements OnInit {
 	private studentService = inject(StudentService);
+	private router = inject(Router);
 	protected data: StudentRow[] = [];
 	protected loading = false;
 
@@ -34,5 +36,7 @@ export class StudentTableComponent implements OnInit {
 	onRowUnselect($event: TableRowUnSelectEvent<StudentRow>) {
 		this.unSelectedRow = $event.data as StudentRow;
 		this.selectedRow = undefined;
+
+		this.router.navigate(["/app/student-view"]);
 	}
 }

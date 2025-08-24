@@ -28,8 +28,8 @@ export interface Student {
 
 export function studentFromFormRegistration(form: any, responsibleUid: string): StudentNoUid {
 	return {
-		lastName: form.student.lastName,
-		firstName: form.student.firstName,
+		lastName: form.student.lastName.trim(),
+		firstName: form.student.firstName.trim(),
 		birthDate: form.student.birthDate ? new Date(form.student.birthDate) : new Date(),
 		responsible: responsibleUid,
 		isStudentResponsible: form.responsible.isStudentResponsible,
@@ -42,7 +42,7 @@ export function studentFromFormRegistration(form: any, responsibleUid: string): 
 		activities: form.activities || [],
 		meanOfPayment: form.payment.meanOfPayment || [],
 		paymentMethod: form.payment.method || "1x",
-		comments: form.comments || "",
+		comments: form.comments.trim() || "",
 		createdAt: form.audit.createdAt || new Date(),
 		createdBy: form.audit.createdBy,
 	};

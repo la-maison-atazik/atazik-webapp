@@ -14,12 +14,7 @@
 		<ng-template #start>
 			<p-button pRipple icon="pi pi-times" label="Annuler" severity="secondary" (onClick)="goBack()"
 								[loading]="loading"/>
-			<p-chip
-				icon="pi pi-money-bill"
-				class="margin-l2"
-				label="Montant total : {{ totalActivities() | currency:'EUR':'symbol':'1.0-0' }}">
-			</p-chip>
-			<p-message class="margin-l1" severity="info">
+			<p-message severity="info">
 				Inscription pour l'année {{ currentYearString }}
 			</p-message>
 		</ng-template>
@@ -87,6 +82,25 @@
 				<p-accordion-content formGroupName="responsible">
 					<p class="margin-b1">Cette section vous permet de saisir les informations légal de l'élève ou
 						de son responsable légal.</p>
+					<div class="input-row">
+						<label for="listPossibleResponsible" class="text-secondary">Responsable existant</label>
+						<p-select
+							inputId="listPossibleResponsible"
+							[options]="possibleResponsibleList"
+							placeholder="Choisir un responsable existant"
+							optionLabel="displayName" optionValue="uid"
+							[showClear]="true"
+							[disabled]="possibleResponsibleList.length === 1"
+							(onChange)="onListResponsibleSelect($event)"
+						/>
+					</div>
+					@if (possibleResponsibleList.length > 1 && possibleResponsibleSelected === undefined) {
+						<p-message severity="info">
+							Vous pouvez sélectionner un responsable légal existant dans la liste ci-dessus pour pré-remplir
+							les informations.
+						</p-message>
+					}
+					<p-divider/>
 					<div class="checkbox-container margin-b2">
 						<p-checkbox formControlName="isStudentResponsible" binary="true" inputId="student-is-responsible"/>
 						<label for="student-is-responsible">L'élève est son propre responsable légal</label>
@@ -110,7 +124,7 @@
 										 placeholder="0612345678" required/>
 						</p-floatlabel>
 					</div>
-					<div class="input-row">
+					<div class="input-row margin-b1">
 						<p-floatlabel>
 							<label for="responsibleAddress">Adresse</label>
 							<input id="responsibleAddress" pInputText formControlName="address"

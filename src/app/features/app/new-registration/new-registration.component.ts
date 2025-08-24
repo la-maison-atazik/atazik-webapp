@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { ToastModule } from "primeng/toast";
 import { ButtonModule } from "primeng/button";
 import { Ripple } from "primeng/ripple";
@@ -16,7 +16,7 @@ import { consentsMandatory } from "../../../shared/validators/consents-mandatory
 import { Auth } from "@angular/fire/auth";
 import { ACTIVITIES_CATALOG } from "../../../core/constants/activities.constant";
 import { MessageModule } from "primeng/message";
-import { SelectModule } from "primeng/select";
+import { SelectChangeEvent, SelectModule } from "primeng/select";
 import { ChipModule } from "primeng/chip";
 import { Textarea } from "primeng/textarea";
 import { addDoc, collection, Firestore } from "@angular/fire/firestore";
@@ -25,6 +25,9 @@ import { studentFromFormRegistration } from "../../../core/models/student.model"
 import { calculateAge } from "@shared/utils/age.utils";
 import { FirestoreCollectionsEnum } from "@shared/enums/firebase/firestore-collections.enum";
 import { responsibleFromFormRegistration } from "../../../core/models/responsible.model";
+import { Subscription } from "rxjs";
+import { ResponsibleService } from "../../../core/services/responsible.service";
+import { Divider } from "primeng/divider";
 
 export type PaymentMethod = "" | "1x" | "3x" | "10x";
 export type MeanOfPayment = "virement" | "cheque" | "ancv" | "chequier_jeune";
@@ -49,18 +52,23 @@ export type MeanOfPayment = "virement" | "cheque" | "ancv" | "chequier_jeune";
 		SelectModule,
 		ChipModule,
 		Textarea,
+		Divider,
 	],
 	templateUrl: "./new-registration.component.html",
 	styleUrl: "./new-registration.component.scss",
 })
-export class NewRegistrationComponent implements OnInit {
+export class NewRegistrationComponent implements OnInit, OnDestroy {
 	private confirmationService = inject(ConfirmationService);
 	private messageService = inject(MessageService);
 	private formBuilder = inject(FormBuilder);
 	private auth = inject(Auth);
 	private firestore = inject(Firestore);
+	private responsibleService = inject(ResponsibleService);
 
-	// Paramètres
+	// Les subscriptions à nettoyer à la destruction du composant pour éviter les fuites mémoires
+	private readonly subscriptions: Subscription[] = [];
+
+	// Paramètres de tarification
 	protected readonly subscriptionCost = 10; // €
 	protected readonly discountThreshold = 3; // nb d'activités pour déclencher la remise
 	protected readonly discountRate = 0.04; // 4%
@@ -72,6 +80,7 @@ export class NewRegistrationComponent implements OnInit {
 
 	protected currentYearString = "";
 
+	// Séparé pour la génération dynamique dans le DOM
 	protected formControlMeanOfPayment = this.formBuilder.control<MeanOfPayment[]>([]);
 
 	protected registrationForm = this.formBuilder.group({
@@ -135,13 +144,34 @@ export class NewRegistrationComponent implements OnInit {
 		];
 	}
 
+	private fetchResponsibleTimeout?: number | undefined;
+	private _possibleResponsibleList: { uid?: string; displayName: string; email: string }[] = [
+		{ uid: "", displayName: "Aucun responsable existant trouvé", email: "" },
+	];
+	set possibleResponsibleList(value) {
+		this._possibleResponsibleList = value;
+		this._possibleResponsibleList.push({
+			uid: undefined,
+			displayName: value.length === 0 ? "Aucun responsable existant trouvé" : "Aucun de ces responsables",
+			email: "",
+		});
+		this._possibleResponsibleList = this._possibleResponsibleList.sort((a, b) =>
+			a.displayName.localeCompare(b.displayName),
+		);
+	}
+
+	get possibleResponsibleList() {
+		return this._possibleResponsibleList;
+	}
+	protected possibleResponsibleSelected?: { uid?: string; displayName: string; email: string };
+
 	nbActivities = signal(0);
 	totalActivities = signal(0);
 	discount = signal(0);
 	total = signal(0);
 
 	public ngOnInit() {
-		this.registrationForm.valueChanges.subscribe((values) => {
+		const globalSub = this.registrationForm.valueChanges.subscribe((values) => {
 			this.hasData = Object.values(values).some((val) => {
 				// Handle nested objects and arrays
 				if (typeof val === "object" && val !== null) {
@@ -160,8 +190,9 @@ export class NewRegistrationComponent implements OnInit {
 				return val && val.toString().trim() !== "";
 			});
 		});
+		this.subscriptions.push(globalSub);
 
-		this.registrationForm.get("student.birthDate")?.valueChanges.subscribe((birthDate) => {
+		const birthSub = this.registrationForm.get("student.birthDate")?.valueChanges.subscribe((birthDate) => {
 			if (birthDate) {
 				const age = calculateAge(birthDate);
 				this.registrationForm.patchValue({
@@ -171,19 +202,114 @@ export class NewRegistrationComponent implements OnInit {
 				});
 			}
 		});
+		if (birthSub) {
+			this.subscriptions.push(birthSub);
+		}
 
-		this.registrationForm.get("responsible.isStudentResponsible")?.valueChanges.subscribe((isResponsible) => {
-			if (isResponsible) {
-				this.registrationForm
-					.get("responsible.firstName")
-					?.patchValue(this.registrationForm.get("student.firstName")!.value!);
-				this.registrationForm
-					.get("responsible.lastName")
-					?.patchValue(this.registrationForm.get("student.lastName")!.value!);
-			} else {
-				this.registrationForm.get("responsible.firstName")?.patchValue("");
-				this.registrationForm.get("responsible.lastName")?.patchValue("");
+		// Recherche de responsables possibles lors de la saisie du nom de l'élève
+		// Si un responsable est sélectionné, on ne fait plus de recherche
+		// Attente de 500ms après  la dernière saisie avant de lancer la recherche
+		const studentNameSub = this.registrationForm.get("student.lastName")?.valueChanges.subscribe((value) => {
+			if (this.possibleResponsibleSelected) {
+				return;
 			}
+			if (this.fetchResponsibleTimeout) {
+				clearTimeout(this.fetchResponsibleTimeout);
+			}
+			this.fetchResponsibleTimeout = setTimeout(() => {
+				if (value && value.trim().length >= 2) {
+					this.possibleResponsibleList = this.responsibleService
+						.researchPossibleResponsible({
+							lastName: value,
+						})
+						.map((r) => ({
+							uid: r.uid,
+							displayName: r.firstName + " " + r.lastName,
+							email: r.email,
+						}));
+				} else {
+					this.possibleResponsibleList = [];
+				}
+			}, 500);
+		});
+		if (studentNameSub) {
+			this.subscriptions.push(studentNameSub);
+		}
+
+		// Recherche de responsables possibles lors de la saisie du prénom / nom / email du responsable
+		// Si un responsable est sélectionné, on ne fait plus de recherche
+		// Attente de 500ms après la dernière saisie avant de lancer la recherche
+		const responsibleFirstNameSub = this.registrationForm.get("responsible.firstName")?.valueChanges.subscribe(() => {
+			if (this.possibleResponsibleSelected) {
+				return;
+			}
+			if (this.fetchResponsibleTimeout) {
+				clearTimeout(this.fetchResponsibleTimeout);
+			}
+			this.setResponsibleTimeout();
+		});
+		if (responsibleFirstNameSub) {
+			this.subscriptions.push(responsibleFirstNameSub);
+		}
+
+		const responsibleLastNameSub = this.registrationForm.get("responsible.lastName")?.valueChanges.subscribe(() => {
+			if (this.possibleResponsibleSelected) {
+				return;
+			}
+			if (this.fetchResponsibleTimeout) {
+				clearTimeout(this.fetchResponsibleTimeout);
+			}
+			this.setResponsibleTimeout();
+		});
+		if (responsibleLastNameSub) {
+			this.subscriptions.push(responsibleLastNameSub);
+		}
+
+		const responsibleEmailSub = this.registrationForm.get("responsible.email")?.valueChanges.subscribe(() => {
+			if (this.possibleResponsibleSelected) {
+				return;
+			}
+			if (this.fetchResponsibleTimeout) {
+				clearTimeout(this.fetchResponsibleTimeout);
+			}
+			this.setResponsibleTimeout();
+		});
+		if (responsibleEmailSub) {
+			this.subscriptions.push(responsibleEmailSub);
+		}
+
+		const isRespSub = this.registrationForm
+			.get("responsible.isStudentResponsible")
+			?.valueChanges.subscribe((isResponsible) => {
+				if (isResponsible) {
+					this.registrationForm
+						.get("responsible.firstName")
+						?.patchValue(this.registrationForm.get("student.firstName")!.value!);
+					this.registrationForm
+						.get("responsible.lastName")
+						?.patchValue(this.registrationForm.get("student.lastName")!.value!);
+				} else {
+					this.registrationForm.get("responsible.firstName")?.patchValue("");
+					this.registrationForm.get("responsible.lastName")?.patchValue("");
+				}
+			});
+		if (isRespSub) {
+			this.subscriptions.push(isRespSub);
+		}
+
+		// Observable sur le stream des responsbles au cas ou un nouveau serait ajouté pendant la saisie du formulaire
+		const responsibleListSub = this.responsibleService.responsibleList$.subscribe(() => {
+			if (this.possibleResponsibleSelected) {
+				const selected = this.responsibleService.currentResponsibleList.find(
+					(r) => r.uid === this.possibleResponsibleSelected?.uid,
+				);
+				if (!selected) {
+					this.possibleResponsibleSelected = undefined;
+					this.registrationForm.get("responsible")?.enable();
+				}
+			}
+
+			this.setResponsibleTimeout();
 		});
 
 		this.addActivity();
@@ -225,8 +351,9 @@ export class NewRegistrationComponent implements OnInit {
 
 		this.loading = true;
 
+		const rawValues = this.registrationForm.getRawValue();
 		// Envoi / définition du responsable
-		const responsible = responsibleFromFormRegistration(this.registrationForm.get("responsible")?.getRawValue());
+		const responsible = responsibleFromFormRegistration(rawValues);
 		const responsibleCollectionRef = collection(this.firestore, FirestoreCollectionsEnum.RESPONSIBLE);
 		let uidResponsible = "";
 		try {
@@ -243,10 +370,10 @@ export class NewRegistrationComponent implements OnInit {
 		}
 
 		// Envoi de l'étudiant
-		const student = studentFromFormRegistration(this.registrationForm.getRawValue(), uidResponsible);
+		const student = studentFromFormRegistration(rawValues, uidResponsible);
 		const studentCollectionRef = collection(
 			this.firestore,
-			FirestoreCollectionsEnum.STUDENT + "/" + this.currentYearString,
+			FirestoreCollectionsEnum.STUDENT + "/" + this.currentYearString + "/records",
 		);
 		addDoc(studentCollectionRef, student)
 			.then(() => {
@@ -325,5 +452,64 @@ export class NewRegistrationComponent implements OnInit {
 		this.addActivity();
 		this.updateTotals();
 		this.hasData = false;
+	}
+
+	protected onListResponsibleSelect(event: SelectChangeEvent) {
+		const selectedUid = event.value;
+		const selected = this.possibleResponsibleList.find((r) => r.uid === selectedUid);
+		if (selected) {
+			this.possibleResponsibleSelected = selected;
+			const responsible = this.responsibleService.currentResponsibleList.find((r) => r.uid === selected.uid);
+			if (responsible) {
+				this.registrationForm.patchValue({
+					responsible: {
+						firstName: responsible.firstName,
+						lastName: responsible.lastName,
+						email: responsible.email,
+						phone: responsible.phone,
+						address: responsible.address,
+						postalCode: responsible.postalCode,
+						city: responsible.city,
+					},
+				});
+				this.registrationForm.get("responsible")?.disable();
+				return;
+			}
+		}
+		this.registrationForm.get("responsible")?.enable();
+	}
+
+	public ngOnDestroy() {
+		this.subscriptions.forEach((sub) => sub.unsubscribe());
+		if (this.fetchResponsibleTimeout) {
+			clearTimeout(this.fetchResponsibleTimeout);
+		}
+	}
+
+	private setResponsibleTimeout() {
+		this.fetchResponsibleTimeout = setTimeout(() => {
+			const firstName = this.registrationForm.get("responsible.firstName")?.value;
+			const lastName = this.registrationForm.get("responsible.lastName")?.value;
+			const email = this.registrationForm.get("responsible.email")?.value;
+			if (
+				(email && email.trim().length >= 5) ||
+				(firstName && firstName.trim().length >= 2) ||
+				(lastName && lastName.trim().length >= 2)
+			) {
+				this.possibleResponsibleList = this.responsibleService
+					.researchPossibleResponsible({
+						email: email!,
+						firstName: firstName!,
+						lastName: lastName!,
+					})
+					.map((r) => ({
+						uid: r.uid,
+						displayName: r.firstName + " " + r.lastName,
+						email: r.email,
+					}));
+			} else {
+				this.possibleResponsibleList = [];
+			}
+		}, 500);
 	}
 }

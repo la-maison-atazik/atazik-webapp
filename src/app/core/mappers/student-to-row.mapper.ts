@@ -9,6 +9,7 @@ export function mapStudentToRow(student: Student): StudentRow {
 		displayName: `${student.firstName} ${student.lastName}`,
 		age: calculateAgeFromTimestamp(student.birthDate as Timestamp),
 		isStudentResponsible: student.isStudentResponsible,
+		student: student,
 	};
 }
 
