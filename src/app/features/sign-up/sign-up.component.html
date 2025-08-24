@@ -1,4 +1,3 @@
-<p-toast/>
 @if (isSignInWithEmailLink) {
 	<p-card header="S'inscrire">
 		<p-divider/>
@@ -55,6 +54,18 @@
 				</p-iconfield>
 				<label for="confirmPassword">Confirmer votre mot de passe</label>
 			</p-floatlabel>
+			<p-message severity="info">
+				Les mots de passe doivent contenir au minimum :
+				<ul>
+					<li>10 caractères</li>
+					<li>1 lettre majuscule</li>
+					<li>1 lettre minuscule</li>
+					<li>1 chiffre</li>
+					<li>1 caractère spécial (!&#64;#$%^&* etc.)</li>
+				</ul>
+			</p-message>
+
+
 
 			@if (formSignUp.touched && formSignUp.errors?.['passwordMismatch']) {
 				<p-message severity="error">Les mots de passe ne correspondent pas.</p-message>

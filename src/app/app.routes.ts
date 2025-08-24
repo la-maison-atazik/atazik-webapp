@@ -8,6 +8,9 @@ import { roleGuard } from "./core/guards/role.guard";
 import { UserRoleEnum } from "@shared/enums/user-roles.enum";
 import { statusGuard } from "./core/guards/status.guard";
 import { UserStatusEnum } from "@shared/enums/user-status.enum";
+import { DashboardComponent } from "./features/app/dashboard/dashboard.component";
+import { NewRegistrationComponent } from "./features/app/new-registration/new-registration.component";
+import { StudentViewComponent } from "./features/app/student-view/student-view.component";
 
 const redirectUnauthorizedToSignIn = () => redirectUnauthorizedTo(["/sign-in"]);
 
@@ -26,6 +29,21 @@ export const routes: Routes = [
 				path: "home",
 				component: HomeComponent,
 				title: "Atazik - Accueil",
+			},
+			{
+				path: "dashboard",
+				component: DashboardComponent,
+				title: "Atazik - Tableau de bord",
+			},
+			{
+				path: "new-registration",
+				component: NewRegistrationComponent,
+				title: "Atazik - Nouvelle inscription",
+			},
+			{
+				path: "student-view",
+				component: StudentViewComponent,
+				title: "Atazik - Fiche élève",
 			},
 			{
 				path: "user-management",

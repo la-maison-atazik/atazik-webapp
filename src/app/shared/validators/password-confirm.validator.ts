@@ -1,4 +1,3 @@
-// match-fields.validator.ts
 import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 
 export function matchFields(field: string, confirmField: string, errorKey = "fieldsMismatch"): ValidatorFn {

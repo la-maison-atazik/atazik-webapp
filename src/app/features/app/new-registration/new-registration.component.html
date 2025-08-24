@@ -1,0 +1,336 @@
+<div class="page-header">
+	<h2>
+		<i class="title-icon pi pi-plus"></i>
+		Nouvelle inscription
+	</h2>
+	<p>
+		Cette page vous permet de créer une nouvelle inscription pour un élève. Vous pouvez saisir les informations
+		d'identité de l'élève, les informations du responsable légal et les modalités de paiement.
+	</p>
+</div>
+
+<form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+	<p-toolbar>
+		<ng-template #start>
+			<p-button pRipple icon="pi pi-times" label="Annuler" severity="secondary" (onClick)="goBack()"
+								[loading]="loading"/>
+			<p-message severity="info">
+				Inscription pour l'année {{ currentYearString }}
+			</p-message>
+		</ng-template>
+
+		<ng-template #end>
+			@if (registrationForm.invalid) {
+				<p-message severity="warn">
+					Le formulaire n'est pas totalement ou correctement rempli.
+				</p-message>
+			} @else {
+				<p-message severity="success">
+					L'inscription est prête à être confirmée.
+				</p-message>
+			}
+			<p-button pRipple icon="pi pi-check" label="Confirmer l'inscription" type="submit"
+								[disabled]="!hasData || registrationForm.invalid" [loading]="loading"/>
+		</ng-template>
+	</p-toolbar>
+
+	<p-card>
+		<p-accordion value="0">
+			<p-accordion-panel value="0">
+				<p-accordion-header>
+					<span>
+						@if (registrationForm.get("student")!.valid) {
+							<i class="pi pi-check-circle text-success"></i>
+						} @else {
+							<i class="pi pi-times-circle text-warning"></i>
+						}
+						1. Identité de l'élève
+					</span>
+				</p-accordion-header>
+				<p-accordion-content formGroupName="student">
+					<p class="margin-b2">
+						Cette section vous permet de saisir les informations d'identité de l'élève.
+					</p>
+					<div class="input-row">
+						<p-floatlabel>
+							<label for="firstName">Prénom</label>
+							<input id="firstName" pInputText formControlName="firstName" placeholder="John" required/>
+						</p-floatlabel>
+						<p-floatlabel>
+							<label for="lastName">Nom</label>
+							<input id="lastName" pInputText formControlName="lastName" placeholder="Doe" required/>
+						</p-floatlabel>
+						<p-floatlabel>
+							<label for="birthDate">Date de naissance</label>
+							<p-datePicker formControlName="birthDate" placeholder="01/01/1900" required/>
+						</p-floatlabel>
+					</div>
+				</p-accordion-content>
+			</p-accordion-panel>
+
+			<p-accordion-panel value="1">
+				<p-accordion-header>
+					<span>
+						@if (registrationForm.get("responsible")!.valid) {
+							<i class="pi pi-check-circle text-success"></i>
+						} @else {
+							<i class="pi pi-times-circle text-warning"></i>
+						}
+						2. Responsable légal (adhérent actif)
+					</span>
+				</p-accordion-header>
+				<p-accordion-content formGroupName="responsible">
+					<p class="margin-b1">Cette section vous permet de saisir les informations légal de l'élève ou
+						de son responsable légal.</p>
+					<div class="input-row">
+						<label for="listPossibleResponsible" class="text-secondary">Responsable existant</label>
+						<p-select
+							inputId="listPossibleResponsible"
+							[options]="possibleResponsibleList"
+							placeholder="Choisir un responsable existant"
+							optionLabel="displayName" optionValue="uid"
+							[showClear]="true"
+							[disabled]="possibleResponsibleList.length === 1"
+							(onChange)="onListResponsibleSelect($event)"
+						/>
+					</div>
+					@if (possibleResponsibleList.length > 1 && possibleResponsibleSelected === undefined) {
+						<p-message severity="info">
+							Vous pouvez sélectionner un responsable légal existant dans la liste ci-dessus pour pré-remplir
+							les informations.
+						</p-message>
+					}
+					<p-divider/>
+					<div class="checkbox-container margin-b2">
+						<p-checkbox formControlName="isStudentResponsible" binary="true" inputId="student-is-responsible"/>
+						<label for="student-is-responsible">L'élève est son propre responsable légal</label>
+					</div>
+					<div class="input-row margin-b2">
+						<p-floatlabel>
+							<label for="responsibleFirstName">Prénom</label>
+							<input id="responsibleFirstName" pInputText formControlName="firstName" placeholder="Jane" required/>
+						</p-floatlabel>
+						<p-floatlabel>
+							<label for="responsibleLastName">Nom</label>
+							<input id="responsibleLastName" pInputText formControlName="lastName" placeholder="Doe" required/>
+						</p-floatlabel>
+						<p-floatlabel>
+							<label for="responsibleEmail">E-mail</label>
+							<input id="responsibleEmail" pInputText formControlName="email" placeholder="exemple@mail.com" required/>
+						</p-floatlabel>
+						<p-floatlabel>
+							<label for="responsiblePhone">Téléphone</label>
+							<input id="responsiblePhone" pInputText formControlName="phone"
+										 placeholder="0612345678" required/>
+						</p-floatlabel>
+					</div>
+					<div class="input-row margin-b1">
+						<p-floatlabel>
+							<label for="responsibleAddress">Adresse</label>
+							<input id="responsibleAddress" pInputText formControlName="address"
+										 placeholder="123 Rue de l'Exemple" required/>
+						</p-floatlabel>
+						<p-floatlabel>
+							<label for="responsiblePostalCode">Code postal</label>
+							<input id="responsiblePostalCode" pInputText formControlName="postalCode"
+										 placeholder="75000" required/>
+						</p-floatlabel>
+						<p-floatlabel>
+							<label for="responsibleCity">Ville</label>
+							<input id="responsibleCity" pInputText formControlName="city" placeholder="Paris" required/>
+						</p-floatlabel>
+					</div>
+				</p-accordion-content>
+			</p-accordion-panel>
+
+			<p-accordion-panel value="2">
+				<p-accordion-header>
+					<span>
+						@if (registrationForm.get("activities")!.valid) {
+							<i class="pi pi-check-circle text-success"></i>
+						} @else {
+							<i class="pi pi-times-circle text-warning"></i>
+						}
+						3. Choix des activités
+					</span>
+				</p-accordion-header>
+				<p-accordion-content formArrayName="activities">
+					<p class="margin-b2">Cette section vous permet de sélectionner les activités auxquelles l'élève
+						souhaite participer.<br>Vous pouvez choisir plusieurs activités.</p>
+					@for (activity of activities.controls; track activity; let index = $index; ) {
+						<div class="input-row margin-b1" [formGroupName]="index">
+							<p-select formControlName="id"
+												placeholder="Choisir une activité"
+												[options]="catalog" optionLabel="name"
+												optionValue="id" required (onChange)="onActivityChange(activity)"/>
+
+							<p-select
+								formControlName="forfait"
+								placeholder="Forfait"
+								[options]="forfaitsForActivity(index)!" optionLabel="label"
+								optionValue="label"
+								(onChange)="onForfaitChange(activity)"
+								required
+							/>
+
+							<p-floatlabel>
+								<label [for]="index+'-teacher'">Intervenant souhaité</label>
+								<input pInputText formControlName="teacher" [id]="index+'-teacher'"
+											 placeholder="Jeremy"/>
+							</p-floatlabel>
+
+							<p-button icon="pi pi-trash" severity="danger"
+												[disabled]="activities.length === 1"
+												(click)="removeActivity(index)"/>
+
+							<div class="activity-recap">
+								@if (activity.get('id')?.value === '') {
+									<p-message severity="warn">
+										Veuillez sélectionner une activité.
+									</p-message>
+								} @else if (activity.get('forfait')?.value === '') {
+									<p-message severity="warn">
+										Veuillez sélectionner un forfait pour l'activité.
+									</p-message>
+								} @else {
+									<p-message severity="info">
+										+ {{ activity.get('price')?.value | currency:'EUR':'symbol':'1.0-0' }}
+									</p-message>
+								}
+							</div>
+						</div>
+					}
+					<p-button icon="pi pi-plus" label="Ajouter une activité" class="margin-b1"
+										(click)="addActivity()"/>
+				</p-accordion-content>
+			</p-accordion-panel>
+
+			<p-accordion-panel value="3">
+				<p-accordion-header>
+					<span>
+						@if (registrationForm.get("payment")!.valid) {
+							<i class="pi pi-check-circle text-success"></i>
+						} @else {
+							<i class="pi pi-times-circle text-warning"></i>
+						}
+						4. Modalités de paiement
+					</span>
+				</p-accordion-header>
+				<p-accordion-content formGroupName="payment">
+					<p class="margin-b1">
+						Cette section vous permet de saisir les modalités de paiement pour l'inscription de l'élève.
+					</p>
+					<div class="input-row">
+						<label for="paymentMethod" class="text-secondary">Méthode de paiement</label>
+						<p-select inputId="paymentMethod" formControlName="method" placeholder="Choisir un mode de paiement"
+											[options]="paymentMethods" optionLabel="label" optionValue="value" required/>
+					</div>
+					<p class="description-mean-payment">Les informations ci-dessous sont à titre prévisionnelle.</p>
+					<div class="input-row">
+						@for (meanOfPayment of meanOfPaymentOptions; track meanOfPayment.value) {
+							<div class="checkbox-container">
+								<p-checkbox [value]="meanOfPayment.value" [inputId]="meanOfPayment.value"
+														[formControl]="formControlMeanOfPayment"/>
+								<label [for]="meanOfPayment.value">{{ meanOfPayment.label }}</label>
+							</div>
+						}
+					</div>
+				</p-accordion-content>
+			</p-accordion-panel>
+
+			<p-accordion-panel value="4">
+				<p-accordion-header>
+					<span>
+						@if (registrationForm.get("consents")!.valid) {
+							<i class="pi pi-check-circle text-success"></i>
+						} @else {
+							<i class="pi pi-times-circle text-warning"></i>
+						}
+						5. Consentements
+					</span>
+				</p-accordion-header>
+				<p-accordion-content formGroupName="consents">
+					<p class="margin-b2">Cette section vous permet de saisir les informations de consentements
+						relatives à l'adhésion de l'élève.</p>
+					<div class="checkbox-container margin-b1">
+						<p-checkbox formControlName="imageRight" binary="true" inputId="imageRight"/>
+						<label for="imageRight">
+							J'autorise l'association à utiliser l'image de l'élève dans le cadre des activités de l'association
+							et sur les supports de communication (site web, réseaux sociaux, etc.)
+						</label>
+					</div>
+					<div class="checkbox-container margin-b1">
+						<p-checkbox formControlName="insuranceRC" binary="true" inputId="insuranceRC"/>
+						<label for="insuranceRC">
+							J'atteste que l'élève est couvert par une assurance responsabilité civile pour les activités de
+							l'association. (Obligatoire)
+						</label>
+					</div>
+					<div class="checkbox-container margin-b1">
+						<p-checkbox formControlName="internalRules" binary="true" inputId="internalRules"/>
+						<label for="internalRules">
+							J'ai lu et j'accepte le règlement intérieur de l'association. (Obligatoire)
+						</label>
+					</div>
+					<div class="checkbox-container">
+						<p-checkbox formControlName="helpEvent" binary="true" inputId="helpEvent"/>
+						<label for="helpEvent">
+							Je suis prêt à aider lors d'un événement de l'association pour aider à son bon fonctionnement.
+						</label>
+					</div>
+				</p-accordion-content>
+			</p-accordion-panel>
+
+			<p-accordion-panel value="5">
+				<p-accordion-header>
+					<span>
+							<i class="pi pi-info-circle text-info"></i>
+						6. Récapitulatif et commentaires
+					</span>
+				</p-accordion-header>
+				<p-accordion-content>
+					<p class="margin-b1">
+						Cette section donne un récapitulatif du coût total et permet de saisir des commentaires supplémentaires si
+						nécessaire.
+					</p>
+					@if (registrationForm.get("activities")!.invalid) {
+						<p-message severity="warn">
+							Veuillez sélectionner au moins une activité pour l'élève avant d'afficher le coût total.
+						</p-message>
+					} @else {
+						<div class="cost-container">
+							<p>Détails et récapitulatif du coût prévisionnel :</p>
+							<p-chip
+								label="Frais d'adhésion : {{ subscriptionCost | currency:'EUR':'symbol':'1.0-0' }}"/>
+							<span>+</span>
+							<p-chip
+								label="Coût total des activités : {{ totalActivities() | currency:'EUR':'symbol':'1.0-0' }}"/>
+							@if (discount() > 0) {
+								<span>-</span>
+								<p-chip label="Réduction appliquée : {{ discount() | currency:'EUR':'symbol':'1.0-0' }}"/>
+							}
+							<span>=</span>
+							<p-chip class="bg-blue"
+											label="Coût total de l'inscription : {{ total() | currency:'EUR':'symbol':'1.0-0' }}"/>
+						</div>
+						<p class="text-secondary margin-b1">
+							Calcul sans réduction : 10 euros de frais d'adhésion + coût total des activités<br>
+							Calcul avec réduction : 10 euros de frais d'adhésion + (coût total des activités * 0.96)<br>
+							(Réduction de 4% sur le total des activités à partir de 3 activités dans la même famille)
+						</p>
+						<p>Le coût total affiché est calculé selon l'inscription en cours. Si d'autres activités sont à la charges
+							du représentant légal (activité dans la même famille), des réductions supplémentaires peuvent
+							s'appliquer. Pour obtenir le coût réel veuillez vous rendre sur la page des <a>détails du responsable
+								légal.</a></p>
+					}
+					<p-floatlabel class="margin-t2">
+						<label for="comments">Commentaires</label>
+						<textarea id="comments" pTextarea formControlName="comments" rows="3"
+											placeholder="Commentaires ou informations supplémentaires..." [autoResize]="true"
+											maxlength="500"></textarea>
+					</p-floatlabel>
+				</p-accordion-content>
+			</p-accordion-panel>
+		</p-accordion>
+	</p-card>
+</form>
