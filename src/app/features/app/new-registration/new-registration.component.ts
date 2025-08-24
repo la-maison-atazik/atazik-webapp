@@ -311,6 +311,7 @@ export class NewRegistrationComponent implements OnInit, OnDestroy {
 
 			this.setResponsibleTimeout();
 		});
+		this.subscriptions.push(responsibleListSub);
 
 		this.addActivity();
 		this.updateTotals();
@@ -350,16 +351,31 @@ export class NewRegistrationComponent implements OnInit, OnDestroy {
 		}
 
 		this.loading = true;
-
 		const rawValues = this.registrationForm.getRawValue();
-		// Envoi / définition du responsable
-		const responsible = responsibleFromFormRegistration(rawValues);
-		const responsibleCollectionRef = collection(this.firestore, FirestoreCollectionsEnum.RESPONSIBLE);
+
 		let uidResponsible = "";
-		try {
-			uidResponsible = (await addDoc(responsibleCollectionRef, responsible)).id;
-		} catch (err) {
-			console.error("Erreur lors de l'enregistrement du responsable :", err);
+		if (this.possibleResponsibleSelected === undefined || this.possibleResponsibleSelected.uid === undefined) {
+			// Aucun responsable sélectionné, on crée un nouveau responsable
+			const responsible = responsibleFromFormRegistration(rawValues);
+			const responsibleCollectionRef = collection(this.firestore, FirestoreCollectionsEnum.RESPONSIBLE);
+			// Envoi / définition du responsable
+			try {
+				uidResponsible = (await addDoc(responsibleCollectionRef, responsible)).id;
+			} catch (err) {
+				console.error("Erreur lors de l'enregistrement du responsable :", err);
+				this.messageService.add({
+					severity: "error",
+					summary: "Erreur",
+					detail: "Une erreur est survenue lors de l'enregistrement du responsable. Veuillez réessayer.",
+				});
+				this.loading = false;
+				return;
+			}
+		} else if (this.possibleResponsibleSelected.uid) {
+			// Un responsable est sélectionné
+			uidResponsible = this.possibleResponsibleSelected.uid;
+		} else {
+			console.error("Aucun responsable sélectionné et aucun nouveau responsable à créer.");
 			this.messageService.add({
 				severity: "error",
 				summary: "Erreur",
