@@ -1,4 +1,4 @@
 export interface ActivityOption {
-	label: string;
-	price: number;
+  label: string;
+  price: number;
 }

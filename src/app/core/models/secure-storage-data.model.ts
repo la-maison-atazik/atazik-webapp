@@ -1,4 +1,4 @@
 export interface SecureStorageData<T> {
-	value: T;
-	expiresAt: number;
+  value: T;
+  expiresAt: number;
 }

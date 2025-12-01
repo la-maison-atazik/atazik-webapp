@@ -1,23 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { EditRoleDialogComponent } from './edit-role-dialog.component';
+import { EditRoleDialogComponent } from "./edit-role-dialog.component";
 
-describe('EditRoleDialogComponent', () => {
+describe("EditRoleDialogComponent", () => {
   let component: EditRoleDialogComponent;
   let fixture: ComponentFixture<EditRoleDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditRoleDialogComponent]
-    })
-    .compileComponents();
+      imports: [EditRoleDialogComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(EditRoleDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

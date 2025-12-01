@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from "@angular/core";
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+} from "@angular/core";
 import { provideRouter } from "@angular/router";
 
 import { routes } from "./app.routes";
@@ -19,38 +23,38 @@ let app: FirebaseApp | undefined;
 const region = "europe-west9"; // Paris
 
 export const appConfig: ApplicationConfig = {
-	providers: [
-		// Angular imports
-		provideBrowserGlobalErrorListeners(),
-		provideAnimations(),
-		provideZoneChangeDetection({ eventCoalescing: true }),
-		provideRouter(routes),
-		{ provide: DATE_PIPE_DEFAULT_OPTIONS, useValue: { dateFormat: "short" } },
+  providers: [
+    // Angular imports
+    provideBrowserGlobalErrorListeners(),
+    provideAnimations(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    { provide: DATE_PIPE_DEFAULT_OPTIONS, useValue: { dateFormat: "short" } },
 
-		// Firebase imports
-		provideFirebaseApp(() => {
-			if (!app) {
-				app = initializeApp(environment.firebase);
-			}
-			return app;
-		}),
-		provideAuth(() => getAuth()),
-		provideFirestore(() => getFirestore()),
-		provideFunctions(() => getFunctions(app, region)),
+    // Firebase imports
+    provideFirebaseApp(() => {
+      if (!app) {
+        app = initializeApp(environment.firebase);
+      }
+      return app;
+    }),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()),
+    provideFunctions(() => getFunctions(app, region)),
 
-		// PrimeNg imports
-		provideAnimationsAsync(),
-		providePrimeNG({
-			translation: fr,
-			ripple: false,
-			theme: {
-				preset: customPreset,
-				options: {
-					darkModeSelector: ".dark-mode",
-				},
-			},
-		}),
-		MessageService,
-		ConfirmationService,
-	],
+    // PrimeNg imports
+    provideAnimationsAsync(),
+    providePrimeNG({
+      translation: fr,
+      ripple: false,
+      theme: {
+        preset: customPreset,
+        options: {
+          darkModeSelector: ".dark-mode",
+        },
+      },
+    }),
+    MessageService,
+    ConfirmationService,
+  ],
 };

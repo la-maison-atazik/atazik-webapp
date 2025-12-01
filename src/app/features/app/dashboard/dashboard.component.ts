@@ -3,7 +3,6 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { ToastModule } from "primeng/toast";
 import { CardModule } from "primeng/card";
 import { TabsModule } from "primeng/tabs";
-import { ResponsibleTableComponent } from "../../../shared/components/responsible-table/responsible-table.component";
 import { ToolbarModule } from "primeng/toolbar";
 import { ButtonModule } from "primeng/button";
 import { IconField } from "primeng/iconfield";
@@ -14,28 +13,27 @@ import { Router } from "@angular/router";
 import { StudentTableComponent } from "../../../shared/components/student-table/student-table.component";
 
 @Component({
-	selector: "app-dashboard",
-	imports: [
-		ConfirmDialogModule,
-		ToastModule,
-		CardModule,
-		TabsModule,
-		ResponsibleTableComponent,
-		ToolbarModule,
-		ButtonModule,
-		IconField,
-		InputIcon,
-		InputText,
-		Ripple,
-		StudentTableComponent,
-	],
-	templateUrl: "./dashboard.component.html",
-	styleUrl: "./dashboard.component.scss",
+  selector: "app-dashboard",
+  imports: [
+    ConfirmDialogModule,
+    ToastModule,
+    CardModule,
+    TabsModule,
+    ToolbarModule,
+    ButtonModule,
+    IconField,
+    InputIcon,
+    InputText,
+    Ripple,
+    StudentTableComponent,
+  ],
+  templateUrl: "./dashboard.component.html",
+  styleUrl: "./dashboard.component.scss",
 })
 export class DashboardComponent {
-	private router = inject(Router);
+  private router = inject(Router);
 
-	goToNewRegistration() {
-		this.router.navigate(["/app/new-registration"]);
-	}
+  goToNewRegistration() {
+    this.router.navigate(["/app/new-registration"]);
+  }
 }

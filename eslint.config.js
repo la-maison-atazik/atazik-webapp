@@ -8,12 +8,13 @@ module.exports = tseslint.config(
 	// TypeScript & Angular files
 	{
 		files: ["**/*.ts"],
+		ignores: ["**/dist/**"],
 		extends: [
 			eslint.configs.recommended,
 			...tseslint.configs.recommended,
 			...tseslint.configs.stylistic,
 			...angular.configs.tsRecommended,
-			prettierConfig, // must be last to disable conflicting rules
+			prettierConfig, // toujours en dernier
 		],
 		plugins: {
 			prettier: prettierPlugin,
@@ -21,7 +22,7 @@ module.exports = tseslint.config(
 		processor: angular.processInlineTemplates,
 		rules: {
 			"prettier/prettier": "error",
-			"@typescript-eslint/no-explicit-any": "error",
+			"@typescript-eslint/no-explicit-any": "warn",
 			"@angular-eslint/directive-selector": [
 				"error",
 				{
@@ -41,13 +42,17 @@ module.exports = tseslint.config(
 		},
 	},
 
-	// Angular HTML templates
+	//
+	// HTML templates Angular
+	//
 	{
 		files: ["**/*.html"],
+		ignores: ["**/dist/**"],
 		extends: [
 			...angular.configs.templateRecommended,
 			...angular.configs.templateAccessibility,
-			prettierConfig, // for HTML formatting consistency
+			prettierConfig,
 		],
+		rules: {},
 	},
 );

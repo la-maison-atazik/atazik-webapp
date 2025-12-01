@@ -8,13 +8,13 @@ import { filter, map, take } from "rxjs";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const roleGuard: CanActivateFn = (route, state) => {
-	const requiredRole = route.data["role"] as UserRoleEnum;
-	const claimService = inject(ClaimService);
-	// Prevent to quit page with needed role on reloading page even if the user have the right role
+  const requiredRole = route.data["role"] as UserRoleEnum;
+  const claimService = inject(ClaimService);
+  // Prevent to quit page with needed role on reloading page even if the user have the right role
 
-	return toObservable(claimService.role).pipe(
-		filter((role): role is UserRoleEnum => role !== null && role !== undefined),
-		take(1),
-		map((role) => isUserRoleEqualOrHigher(requiredRole, role)),
-	);
+  return toObservable(claimService.role).pipe(
+    filter((role): role is UserRoleEnum => role !== null && role !== undefined),
+    take(1),
+    map((role) => isUserRoleEqualOrHigher(requiredRole, role)),
+  );
 };

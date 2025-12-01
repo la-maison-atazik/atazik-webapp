@@ -3,20 +3,20 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { StudentTableComponent } from "./student-table.component";
 
 describe("SubscriberTableComponent", () => {
-	let component: StudentTableComponent;
-	let fixture: ComponentFixture<StudentTableComponent>;
+  let component: StudentTableComponent;
+  let fixture: ComponentFixture<StudentTableComponent>;
 
-	beforeEach(async () => {
-		await TestBed.configureTestingModule({
-			imports: [StudentTableComponent],
-		}).compileComponents();
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [StudentTableComponent],
+    }).compileComponents();
 
-		fixture = TestBed.createComponent(StudentTableComponent);
-		component = fixture.componentInstance;
-		fixture.detectChanges();
-	});
+    fixture = TestBed.createComponent(StudentTableComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-	it("should create", () => {
-		expect(component).toBeTruthy();
-	});
+  it("should create", () => {
+    expect(component).toBeTruthy();
+  });
 });

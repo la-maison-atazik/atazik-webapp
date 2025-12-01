@@ -17,55 +17,56 @@ import { Ripple } from "primeng/ripple";
 import { Divider } from "primeng/divider";
 
 @Component({
-	selector: "app-sign-in",
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		Password,
-		ButtonModule,
-		InputText,
-		Message,
-		FloatLabel,
-		AuthModule,
-		Card,
-		IconField,
-		InputIcon,
-		Ripple,
-		Divider,
-	],
-	templateUrl: "./sign-in.component.html",
-	styleUrl: "./sign-in.component.scss",
+  selector: "app-sign-in",
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    Password,
+    ButtonModule,
+    InputText,
+    Message,
+    FloatLabel,
+    AuthModule,
+    Card,
+    IconField,
+    InputIcon,
+    Ripple,
+    Divider,
+  ],
+  templateUrl: "./sign-in.component.html",
+  styleUrl: "./sign-in.component.scss",
 })
 export class SignInComponent {
-	private readonly fb: FormBuilder = inject(FormBuilder);
-	private readonly auth = inject(Auth);
-	private readonly router = inject(Router);
-	protected isLoading = false;
+  private readonly fb: FormBuilder = inject(FormBuilder);
+  private readonly auth = inject(Auth);
+  private readonly router = inject(Router);
+  protected isLoading = false;
 
-	error = "";
-	signInForm = this.fb.group({
-		username: ["", [Validators.required, Validators.email]],
-		password: ["", [Validators.required, Validators.pattern(PASSWORD)]],
-	});
+  error = "";
+  signInForm = this.fb.group({
+    username: ["", [Validators.required, Validators.email]],
+    password: ["", [Validators.required, Validators.pattern(PASSWORD)]],
+  });
 
-	async signIn() {
-		this.isLoading = true;
-		this.error = "";
-		const { username, password } = this.signInForm.value;
-		try {
-			await signInWithEmailAndPassword(this.auth, username!.trim().toLowerCase(), password!);
-			this.isLoading = false;
-			await this.router.navigate(["/"]);
-		} catch (err: unknown) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
-			if (err.code === FirebaseErrorsEnum.INVALID_SIGN_IN_CREDENTIALS) {
-				this.error = "Identifiants invalides. Veuillez vérifier votre adresse e-mail et votre mot de passe.";
-			} else {
-				this.error = "Une erreur est survenue. Veuillez réessayer plus tard.";
-				console.log(err);
-			}
-			this.isLoading = false;
-		}
-	}
+  async signIn() {
+    this.isLoading = true;
+    this.error = "";
+    const { username, password } = this.signInForm.value;
+    try {
+      await signInWithEmailAndPassword(this.auth, username!.trim().toLowerCase(), password!);
+      this.isLoading = false;
+      await this.router.navigate(["/"]);
+    } catch (err: unknown) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      if (err.code === FirebaseErrorsEnum.INVALID_SIGN_IN_CREDENTIALS) {
+        this.error =
+          "Identifiants invalides. Veuillez vérifier votre adresse e-mail et votre mot de passe.";
+      } else {
+        this.error = "Une erreur est survenue. Veuillez réessayer plus tard.";
+        console.log(err);
+      }
+      this.isLoading = false;
+    }
+  }
 }
