@@ -7,7 +7,6 @@ export const ACTIVITIES_CATALOG: ActivityCategory[] = [
 		options: [
 			{ label: "Forfait 30 cours (1h)", price: 690 },
 			{ label: "Forfait 15 cours (1h)", price: 360 },
-
 			{ label: "Cours en groupe (1h)", price: 360 },
 		],
 	},

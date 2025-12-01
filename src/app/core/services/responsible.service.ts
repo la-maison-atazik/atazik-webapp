@@ -59,4 +59,8 @@ export class ResponsibleService {
 			return isMatch;
 		});
 	}
+
+	getById(responsible: string) {
+		return this.currentResponsibleList.find((resp) => resp.uid === responsible);
+	}
 }

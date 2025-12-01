@@ -20,9 +20,9 @@ export interface Student {
 	paymentMethod?: PaymentMethod;
 	meanOfPayment?: MeonOfPayment[];
 	comments?: string;
-	createdAt: Date;
+	createdAt?: Date;
 	updatedAt?: Date;
-	createdBy: string;
+	createdBy?: string;
 	updatedBy?: string;
 }
 

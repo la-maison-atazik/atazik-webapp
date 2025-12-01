@@ -12,6 +12,8 @@ import { customPreset } from "./core/constants/themes.constant";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import { getFunctions, provideFunctions } from "@angular/fire/functions";
 import { ConfirmationService, MessageService } from "primeng/api";
+import { DATE_PIPE_DEFAULT_OPTIONS } from "@angular/common";
+import { fr } from "primelocale/js/fr.js";
 
 let app: FirebaseApp | undefined;
 const region = "europe-west9"; // Paris
@@ -23,6 +25,7 @@ export const appConfig: ApplicationConfig = {
 		provideAnimations(),
 		provideZoneChangeDetection({ eventCoalescing: true }),
 		provideRouter(routes),
+		{ provide: DATE_PIPE_DEFAULT_OPTIONS, useValue: { dateFormat: "short" } },
 
 		// Firebase imports
 		provideFirebaseApp(() => {
@@ -38,38 +41,7 @@ export const appConfig: ApplicationConfig = {
 		// PrimeNg imports
 		provideAnimationsAsync(),
 		providePrimeNG({
-			translation: {
-				accept: "Accepter",
-				reject: "Rejeter",
-				passwordPrompt: "Entrez votre mot de passe",
-				cancel: "Annuler",
-				choose: "Choisir",
-				upload: "Télécharger",
-				emptyMessage: "Aucun résultat trouvé",
-				emptyFilterMessage: "Aucun résultat trouvé",
-				emptySelectionMessage: "Aucune sélection",
-				emptySearchMessage: "Aucun résultat trouvé",
-				chooseDate: "Choisir une date",
-				chooseMonth: "Choisir un mois",
-				chooseYear: "Choisir une année",
-				monthNames: [
-					"Janvier",
-					"Février",
-					"Mars",
-					"Avril",
-					"Mai",
-					"Juin",
-					"Juillet",
-					"Août",
-					"Septembre",
-					"Octobre",
-					"Novembre",
-					"Décembre",
-				],
-				monthNamesShort: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jui", "Jui", "Aoû", "Sep", "Oct", "Nov", "Déc"],
-				dayNamesShort: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
-				dayNamesMin: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
-			},
+			translation: fr,
 			ripple: false,
 			theme: {
 				preset: customPreset,

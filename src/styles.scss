@@ -54,6 +54,34 @@ p-password {
 	}
 }
 
+.input-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2rem;
+	align-items: center;
+
+	p-select {
+		min-width: 244px;
+	}
+}
+
+.checkbox-container {
+	display: flex;
+	gap: 1rem;
+
+	label {
+		color: #a1a1aa;
+	}
+}
+
+.margin-b2 {
+	margin-bottom: 2rem;
+}
+
+.margin-b1 {
+	margin-bottom: 1rem;
+}
+
 .p-toolbar > div {
 	flex: 1 !important;
 	flex-wrap: wrap !important;

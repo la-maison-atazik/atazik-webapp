@@ -27,6 +27,13 @@
 				<span>{{ student.age }} ans</span>
 			</td>
 			<td class="action-cell">
+				<p-button
+					icon="pi pi-arrow-right"
+					pRipple
+					text
+					(click)="viewStudent(student)"
+					[disabled]="loading"
+				></p-button>
 			</td>
 		</tr>
 	</ng-template>
