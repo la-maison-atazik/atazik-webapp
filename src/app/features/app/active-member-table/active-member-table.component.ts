@@ -10,10 +10,9 @@ import { InputIcon } from "primeng/inputicon";
 import { InputText } from "primeng/inputtext";
 import { Ripple } from "primeng/ripple";
 import { Router } from "@angular/router";
-import { StudentTableComponent } from "../../../shared/components/student-table/student-table.component";
 
 @Component({
-  selector: "app-dashboard",
+  selector: "app-active-member-table",
   imports: [
     ConfirmDialogModule,
     ToastModule,
@@ -25,12 +24,11 @@ import { StudentTableComponent } from "../../../shared/components/student-table/
     InputIcon,
     InputText,
     Ripple,
-    StudentTableComponent,
   ],
-  templateUrl: "./dashboard.component.html",
-  styleUrl: "./dashboard.component.scss",
+  templateUrl: "./active-member-table.component.html",
+  styleUrl: "./active-member-table.component.scss",
 })
-export class DashboardComponent {
+export class ActiveMemberTableComponent {
   private router = inject(Router);
 
   goToNewRegistration() {

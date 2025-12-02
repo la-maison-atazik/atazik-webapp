@@ -8,8 +8,9 @@ import { UserRoleEnum } from "@shared/enums/user-roles.enum";
 import { statusGuard } from "./core/guards/status.guard";
 import { UserStatusEnum } from "@shared/enums/user-status.enum";
 import { StudentViewComponent } from "./features/app/student-view/student-view.component";
-import { DashboardComponent } from "./features/app/dashboard/dashboard.component";
+import { ActiveMemberTableComponent } from "./features/app/active-member-table/active-member-table.component";
 import { NewRegistrationComponent } from "./features/app/new-registration/new-registration.component";
+import { StudentTableComponent } from "./features/app/student-table/student-table.component";
 
 const redirectUnauthorizedToSignIn = () => redirectUnauthorizedTo(["/sign-in"]);
 
@@ -22,18 +23,23 @@ export const routes: Routes = [
       {
         path: "",
         pathMatch: "full",
-        redirectTo: "dashboard", // TODO change to 'home' when HomeComponent is ready
+        redirectTo: "active-member-table", // TODO change to 'home' when HomeComponent is ready
       },
       {
         path: "home",
         // component: HomeComponent,
         title: "Atazik - Accueil",
-        redirectTo: "/app/dashboard",
+        redirectTo: "/app/active-member-table",
       },
       {
-        path: "dashboard",
-        component: DashboardComponent,
-        title: "Atazik - Tableau de bord",
+        path: "active-member-table",
+        component: ActiveMemberTableComponent,
+        title: "Atazik - Adhérents actifs",
+      },
+      {
+        path: "student-table",
+        component: StudentTableComponent,
+        title: "Atazik - Élèves",
       },
       {
         path: "new-registration",

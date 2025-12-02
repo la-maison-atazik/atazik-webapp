@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { ActiveMemberTableComponent } from "./active-member-table.component";
 
-describe("ResponsibleTableComponent", () => {
+describe("SubscriberManagementComponent", () => {
   let component: ActiveMemberTableComponent;
   let fixture: ComponentFixture<ActiveMemberTableComponent>;
 

@@ -6,10 +6,15 @@ import { TableModule, TableRowSelectEvent, TableRowUnSelectEvent } from "primeng
 import { Router } from "@angular/router";
 import { Button } from "primeng/button";
 import { Ripple } from "primeng/ripple";
+import { Card } from "primeng/card";
+import { IconField } from "primeng/iconfield";
+import { InputIcon } from "primeng/inputicon";
+import { InputText } from "primeng/inputtext";
+import { Toolbar } from "primeng/toolbar";
 
 @Component({
   selector: "app-student-table",
-  imports: [TableModule, Button, Ripple],
+  imports: [TableModule, Button, Ripple, Card, IconField, InputIcon, InputText, Toolbar],
   templateUrl: "./student-table.component.html",
   styleUrl: "./student-table.component.scss",
 })
@@ -32,6 +37,10 @@ export class StudentTableComponent implements OnInit {
     });
   }
 
+  protected goToNewRegistration() {
+    this.router.navigate(["/app/new-registration"]);
+  }
+
   protected onRowSelect($event: TableRowSelectEvent<StudentRow>) {
     this.selectedRow = $event.data as StudentRow;
   }
@@ -44,6 +53,7 @@ export class StudentTableComponent implements OnInit {
   }
 
   protected viewStudent(studentRow: StudentRow): void {
+    console.log(studentRow);
     this.studentService.selectedStudent = studentRow.student;
     this.router.navigate(["/app/student-view"]);
   }
