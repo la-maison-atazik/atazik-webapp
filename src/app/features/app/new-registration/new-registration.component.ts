@@ -18,7 +18,7 @@ import { InputTextModule } from "primeng/inputtext";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { DatePickerModule } from "primeng/datepicker";
 import { CheckboxModule } from "primeng/checkbox";
-import { CommonModule } from "@angular/common";
+import { CommonModule, Location } from "@angular/common";
 import { consentsMandatory } from "../../../shared/validators/consents-mandatory.validator";
 import { Auth } from "@angular/fire/auth";
 import { ACTIVITIES_CATALOG } from "../../../core/constants/activities.constant";
@@ -68,6 +68,7 @@ export class NewRegistrationComponent implements OnInit, OnDestroy {
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
   private formBuilder = inject(FormBuilder);
+  private location = inject(Location);
   private auth = inject(Auth);
   private firestore = inject(Firestore);
   private responsibleService = inject(ResponsibleService);
@@ -451,11 +452,11 @@ export class NewRegistrationComponent implements OnInit, OnDestroy {
         rejectButtonStyleClass: "p-button-secondary",
         accept: () => {
           this.onCancel();
-          window.history.back();
+          this.location.back();
         },
       });
     } else {
-      window.history.back();
+      this.location.back();
     }
   }
 

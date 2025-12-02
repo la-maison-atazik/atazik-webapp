@@ -11,6 +11,7 @@ import { StudentViewComponent } from "./features/app/student-view/student-view.c
 import { ActiveMemberTableComponent } from "./features/app/active-member-table/active-member-table.component";
 import { NewRegistrationComponent } from "./features/app/new-registration/new-registration.component";
 import { StudentTableComponent } from "./features/app/student-table/student-table.component";
+import { studentResolver } from "./shared/resolvers/student-resolver";
 
 const redirectUnauthorizedToSignIn = () => redirectUnauthorizedTo(["/sign-in"]);
 
@@ -47,8 +48,11 @@ export const routes: Routes = [
         title: "Atazik - Nouvelle inscription",
       },
       {
-        path: "student-view",
+        path: "student-view/:uid",
         component: StudentViewComponent,
+        resolve: {
+          student: studentResolver,
+        },
         title: "Atazik - Fiche élève",
       },
       {

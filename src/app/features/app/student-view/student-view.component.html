@@ -1,248 +1,251 @@
 <div class="page-header">
-	<h2>
-		<i class="title-icon pi pi-clipboard"></i>
-		Fiche élève - {{ student?.firstName }} {{ student?.lastName }}
-	</h2>
-	<p>
-		Cette page vous permet de consulter et modifier les informations d'un élève. Vous pouvez éditer ses informations
-		personnelles, les consentements, les activités ainsi que les informations de paiement.
-	</p>
+  <h2>
+    <i class="title-icon pi pi-clipboard"></i>
+    Fiche élève - {{ student().firstName }} {{ student().lastName }}
+  </h2>
+  <p>
+    Cette page vous permet de consulter et modifier les informations d'un élève. Vous pouvez éditer ses informations
+    personnelles, les consentements, les activités ainsi que les informations de paiement.
+  </p>
 </div>
 
 <p-toolbar>
-	<ng-template #start>
-		<p-button type="button" icon="pi pi-arrow-left" label="Retour" severity="secondary"
-							(click)="router.navigate(['../'], { relativeTo: route })"/>
-		@if (!editMode()) {
-			<p-tag severity="info" value="Lecture"/>
-		} @else {
-			<p-tag severity="warn" value="Édition"/>
-		}
-	</ng-template>
+  <ng-template #start>
+    <p-button type="button" icon="pi pi-arrow-left" label="Retour" severity="secondary"
+              (click)="location.back()"/>
+    @if (!editMode()) {
+      <p-tag severity="info" value="Lecture"/>
+    } @else {
+      <p-tag severity="warn" value="Édition"/>
+    }
+  </ng-template>
 
-	<ng-template #end>
-		@if (!editMode()) {
-			<p-button type="button" icon="pi pi-pencil" label="Modifier" (click)="toggleEdit()"
-								[disabled]="loading()"/>
-		} @else {
-			<p-button type="button" icon="pi pi-times" severity="secondary" label="Annuler"
-								(click)="cancelEdit()"/>
-			<p-button type="button" icon="pi pi-save" label="Enregistrer" (click)="save()"/>
-		}
-		<p-button type="button" icon="pi pi-trash" label="Supprimer" (click)="deleteDialog()" severity="danger"
-							[disabled]="loading()"/>
-	</ng-template>
+  <ng-template #end>
+    @if (!editMode()) {
+      <p-button type="button" icon="pi pi-pencil" label="Modifier" (click)="toggleEdit()"
+                [disabled]="loading()"/>
+    } @else {
+      <p-button type="button" icon="pi pi-times" severity="secondary" label="Annuler"
+                (click)="cancelEdit()"/>
+      <p-button type="button" icon="pi pi-save" label="Enregistrer" (click)="save()"/>
+    }
+    <p-button type="button" icon="pi pi-trash" label="Supprimer" (click)="deleteDialog()" severity="danger"
+              [disabled]="loading()"/>
+  </ng-template>
 
 </p-toolbar>
 
 <p-card>
-	@if (!loading()) {
-		<form [formGroup]="studentForm">
-			<!-- Identité -->
-			<div class="main-panel">
-				<h3 class="margin-b2">Identité</h3>
-				<div class="input-row">
-					<p-floatlabel>
-						<label for="lastName">Nom *</label>
-						<input id="lastName" type="text" pInputText formControlName="lastName" placeholder="Nom"/>
-						@if (hasError('lastName')) {
-							<small>Nom requis</small>
-						}
-					</p-floatlabel>
+  @if (!loading()) {
+    <form [formGroup]="studentForm">
+      <!-- Identité -->
+      <div class="main-panel">
+        <h3 class="margin-b2">Identité</h3>
+        <div class="input-row">
+          <p-floatlabel>
+            <label for="lastName">Nom *</label>
+            <input id="lastName" type="text" pInputText formControlName="lastName" placeholder="Nom"/>
+            @if (hasError('lastName')) {
+              <small>Nom requis</small>
+            }
+          </p-floatlabel>
 
-					<p-floatlabel>
-						<label for="firstName">Prénom *</label>
-						<input id="firstName" type="text" pInputText formControlName="firstName" placeholder="Prénom"/>
-						@if (hasError('firstName')) {
-							<small>Prénom requis</small>
-						}
-					</p-floatlabel>
+          <p-floatlabel>
+            <label for="firstName">Prénom *</label>
+            <input id="firstName" type="text" pInputText formControlName="firstName" placeholder="Prénom"/>
+            @if (hasError('firstName')) {
+              <small>Prénom requis</small>
+            }
+          </p-floatlabel>
 
-					<p-floatlabel>
-						<label for="birthDate">Date de naissance *</label>
-						<p-datePicker
-							inputId="birthDate"
-							formControlName="birthDate"
-							[showIcon]="true"
-							[maxDate]="today"
-							dateFormat="dd/mm/yy"
-						></p-datePicker>
-						@if (hasError('birthDate')) {
-							<small>Date requise</small>
-						}
-					</p-floatlabel>
+          <p-floatlabel>
+            <label for="birthDate">Date de naissance *</label>
+            <p-datePicker
+              inputId="birthDate"
+              formControlName="birthDate"
+              [showIcon]="true"
+              [maxDate]="today"
+              dateFormat="dd/mm/yy"
+            ></p-datePicker>
+            @if (hasError('birthDate')) {
+              <small>Date requise</small>
+            }
+          </p-floatlabel>
 
-					<div class="checkbox-container">
-						<p-checkbox formControlName="isStudentResponsible" [binary]="true" inputId="isResp"/>
-						<label for="isResp">L'élève est son propre responsable</label>
-					</div>
+          <div class="checkbox-container">
+            <p-checkbox formControlName="isStudentResponsible" [binary]="true" inputId="isResp"/>
+            <label for="isResp">L'élève est son propre responsable</label>
+          </div>
 
-					<div class="input-row">
-						@if (!studentForm.controls.isStudentResponsible.value) {
-							<p-floatlabel>
-								<label for="responsible">Responsable</label>
-								<input id="responsible" type="text" pInputText formControlName="responsible"
-											 placeholder="Aucun responsable lié"/>
-							</p-floatlabel>
-						}
-						<p-button type="button" icon="pi pi-external-link" severity="secondary" label="Ouvrir fiche responsable"
-											(click)="navigateToResponsible()"/>
-					</div>
-				</div>
+          <div class="input-row">
+            @if (!studentForm.controls.isStudentResponsible.value) {
+              <p-floatlabel>
+                <label for="responsible">Responsable</label>
+                <input id="responsible" type="text" pInputText formControlName="responsible"
+                       placeholder="Aucun responsable lié"/>
+              </p-floatlabel>
+            }
+            <p-button type="button" icon="pi pi-external-link" severity="secondary" label="Ouvrir fiche responsable"
+                      (click)="navigateToResponsible()"/>
+          </div>
+        </div>
 
-				<p-divider/>
+        <p-divider/>
 
-				<!-- Consentements -->
-				<div formGroupName="consents">
-					<h3 class="margin-b1">Consentements</h3>
-					<div class="flex">
-						<div class="checkbox-container">
-							<p-checkbox formControlName="insuranceRC" [binary]="true" inputId="rc"/>
-							<label for="rc">Assurance RC</label>
-						</div>
-						<div class="checkbox-container">
-							<p-checkbox formControlName="internalRules" [binary]="true" inputId="rules"/>
-							<label for="rules">Règlement intérieur</label>
-						</div>
-						<div class="checkbox-container">
-							<p-checkbox formControlName="imageRight" [binary]="true" inputId="image"/>
-							<label for="image">Droit à l'image</label>
-						</div>
-						<div class="checkbox-container">
-							<p-checkbox formControlName="helpEvent" [binary]="true" inputId="help"/>
-							<label for="help">Aide aux événements</label>
-						</div>
-					</div>
-				</div>
+        <!-- Consentements -->
+        <div formGroupName="consents">
+          <h3 class="margin-b1">Consentements</h3>
+          <div class="flex">
+            <div class="checkbox-container">
+              <p-checkbox formControlName="insuranceRC" [binary]="true" inputId="rc"/>
+              <label for="rc">Assurance RC</label>
+            </div>
+            <div class="checkbox-container">
+              <p-checkbox formControlName="internalRules" [binary]="true" inputId="rules"/>
+              <label for="rules">Règlement intérieur</label>
+            </div>
+            <div class="checkbox-container">
+              <p-checkbox formControlName="imageRight" [binary]="true" inputId="image"/>
+              <label for="image">Droit à l'image</label>
+            </div>
+            <div class="checkbox-container">
+              <p-checkbox formControlName="helpEvent" [binary]="true" inputId="help"/>
+              <label for="help">Aide aux événements</label>
+            </div>
+          </div>
+        </div>
 
-				<p-divider/>
+        <p-divider/>
 
-				<!-- Activités -->
-				<div>
-					<div class="margin-b1">
-						<h3 class="margin-b1">Activités</h3>
-						<p-button type="button" severity="secondary" icon="pi pi-plus" label="Ajouter une activité"
-											(click)="addActivity()"
-											[disabled]="!editMode()"/>
-					</div>
+        <!-- Activités -->
+        <div>
+          <div class="margin-b1">
+            <h3 class="margin-b1">Activités</h3>
+            <p-button type="button" severity="secondary" icon="pi pi-plus" label="Ajouter une activité"
+                      (click)="addActivity()"
+                      [disabled]="!editMode()"/>
+          </div>
 
-					<div>
-						<p-table [value]="activities.controls">
-							<ng-template pTemplate="header">
-								<tr>
-									<th style="width: 25%">Activité</th>
-									<th style="width: 30%">Forfait *</th>
-									<th style="width: 15%">Tarif *</th>
-									<th style="width: 15%">Intervenant *</th>
-									<th style="width: 15%" class="text-right">Actions</th>
-								</tr>
-							</ng-template>
-							<ng-template pTemplate="body" let-row let-i="rowIndex">
-								<tr [formGroup]="row">
-									<td>
-										<p-select formControlName="id"
-															placeholder="Aucune activité sélectionnée"
-															[options]="catalog" optionLabel="name"
-															optionValue="id" required/>
-									</td>
-									<td>
-										<p-select
-											formControlName="forfait"
-											placeholder="Forfait"
-											[options]="forfaitsForActivity(row.get('id').value!)!" optionLabel="label"
-											optionValue="label"
-											required
-										/>
-										@if (row.get('forfait')?.invalid && (row.get('forfait')?.touched || row.get('forfait')?.dirty)) {
-											<small>Requis</small>
-										}
-									</td>
-									<td>
-										<p-inputNumber formControlName="price" mode="currency" currency="EUR" [min]="0" [useGrouping]="true"
-																	 [showButtons]="editMode()"/>
-										@if (row.get('price')?.invalid && (row.get('price')?.touched || row.get('price')?.dirty)) {
-											<small>Tarif invalide</small>
-										}
-									</td>
-									<td>
-										<input type="text" pInputText formControlName="teacher" placeholder="Enseignant"/>
-										@if (row.get('teacher')?.invalid && (row.get('teacher')?.touched || row.get('teacher')?.dirty)) {
-											<small>Requis</small>
-										}
-									</td>
-									<td>
-										<p-button type="button" icon="pi pi-trash" severity="danger" (click)="removeActivity(i)"
-															[disabled]="!editMode()"></p-button>
-									</td>
-								</tr>
-							</ng-template>
-						</p-table>
-					</div>
-				</div>
+          <div>
+            <p-table [value]="activities.controls">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th style="width: 25%">Activité *</th>
+                  <th style="width: 30%">Forfait *</th>
+                  <th style="width: 15%">Tarif *</th>
+                  <th style="width: 15%">Intervenant *</th>
+                  <th class="text-right action-header-cell">Actions</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row let-i="rowIndex">
+                <tr [formGroup]="row">
+                  <td>
+                    <p-select formControlName="id"
+                              placeholder="Aucune activité sélectionnée"
+                              [options]="catalog" optionLabel="name"
+                              optionValue="id" appendTo="body" required/>
+                  </td>
+                  <td>
+                    <p-select
+                      formControlName="forfait"
+                      placeholder="Forfait"
+                      [options]="forfaitsForActivity(row.get('id').value!)!" optionLabel="label"
+                      optionValue="label"
+                      (onChange)="onForfaitChange(row)"
+                      appendTo="body"
+                      required
+                    />
+                    @if (row.get('forfait')?.invalid && (row.get('forfait')?.touched || row.get('forfait')?.dirty)) {
+                      <small>Requis</small>
+                    }
+                  </td>
+                  <td>
+                    <p-inputNumber formControlName="price" mode="currency" currency="EUR" [min]="0" [useGrouping]="true"
+                                   [showButtons]="editMode()"/>
+                    @if (row.get('price')?.invalid && (row.get('price')?.touched || row.get('price')?.dirty)) {
+                      <small>Tarif invalide</small>
+                    }
+                  </td>
+                  <td>
+                    <input type="text" pInputText formControlName="teacher" placeholder="Enseignant"/>
+                    @if (row.get('teacher')?.invalid && (row.get('teacher')?.touched || row.get('teacher')?.dirty)) {
+                      <small>Requis</small>
+                    }
+                  </td>
+                  <td>
+                    <p-button type="button" icon="pi pi-trash" severity="danger" (click)="removeActivity(i)"
+                              [disabled]="!editMode()"></p-button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
 
-				<p-divider/>
+        <p-divider/>
 
-				<!-- Paiement -->
-				<div>
-					<h3 class="margin-b1">Informations de paiement</h3>
-					<div class="flex">
-						<div class="input-row">
-							<label for="paymentMethod">Méthode de paiement</label>
-							<p-select
-								inputId="paymentMethod"
-								formControlName="paymentMethod"
-								[options]="paymentMethodOptions"
-								optionLabel="label"
-								optionValue="value"
-								placeholder="Choisir..."
-							/>
-						</div>
+        <!-- Paiement -->
+        <div>
+          <h3 class="margin-b1">Informations de paiement</h3>
+          <div class="flex">
+            <div class="input-row">
+              <label for="paymentMethod">Méthode de paiement</label>
+              <p-select
+                inputId="paymentMethod"
+                formControlName="paymentMethod"
+                [options]="paymentMethodOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Choisir..."
+              />
+            </div>
 
-						<div class="input-row">
-							<label for="meanOfPayment">Moyen(s) de paiement</label>
-							<p-multiSelect
-								inputId="meanOfPayment"
-								formControlName="meanOfPayment"
-								[options]="meanOfPaymentOptions"
-								optionLabel="label"
-								optionValue="value"
-								placeholder="Sélectionner..."
-								display="chip"
-							/>
-						</div>
-					</div>
-				</div>
-			</div>
+            <div class="input-row">
+              <label for="meanOfPayment">Moyen(s) de paiement</label>
+              <p-multiSelect
+                inputId="meanOfPayment"
+                formControlName="meanOfPayment"
+                [options]="meanOfPaymentOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Sélectionner..."
+                display="chip"
+                [showHeader]="false"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
-			<p-divider/>
+      <p-divider/>
 
-			<!-- Panneau latéral: métadonnées -->
-			<div>
-				<h3 class="margin-b1">Autres informations</h3>
-				<div class="input-row margin-b1 column">
-					<label for="comments">Commentaire</label>
-					<textarea id="comments" class="full-width" pInputTextarea rows="4" formControlName="comments"
-										placeholder="Notes internes..."></textarea>
-				</div>
-				<div class="input-row">
-					<span>Créé le</span>
-					<span>{{ studentForm.controls.createdAt.value | date }}</span>
-				</div>
-				<div class="input-row">
-					<span>Créé par</span>
-					<span>{{ studentForm.controls.createdBy.value || '-' }}</span>
-				</div>
-				<div class="input-row">
-					<span>Mis à jour le</span>
-					<span>{{ studentForm.controls.updatedAt.value | date }}</span>
-				</div>
-				<div class="input-row">
-					<span>Maj par</span>
-					<span>{{ studentForm.controls.updatedBy.value || '-' }}</span>
-				</div>
-			</div>
-		</form>
-	} @else {
-		<div class="loading">Chargement…</div>
-	}
+      <!-- Panneau latéral: métadonnées -->
+      <div>
+        <h3 class="margin-b1">Autres informations</h3>
+        <div class="input-row margin-b1 column">
+          <label for="comments">Commentaire</label>
+          <textarea id="comments" class="full-width" pInputTextarea rows="4" formControlName="comments"
+                    placeholder="Notes internes..."></textarea>
+        </div>
+        <div class="input-row">
+          <span>Créé le</span>
+          <span>{{ studentForm.controls.createdAt.value | date }}</span>
+        </div>
+        <div class="input-row">
+          <span>Créé par</span>
+          <span>{{ studentForm.controls.createdBy.value || '-' }}</span>
+        </div>
+        <div class="input-row">
+          <span>Mis à jour le</span>
+          <span>{{ studentForm.controls.updatedAt.value | date }}</span>
+        </div>
+        <div class="input-row">
+          <span>Mis à jour par</span>
+          <span>{{ studentForm.controls.updatedBy.value || '-' }}</span>
+        </div>
+      </div>
+    </form>
+  } @else {
+    <div class="loading">Chargement…</div>
+  }
 </p-card>

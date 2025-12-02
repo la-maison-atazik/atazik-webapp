@@ -31,7 +31,6 @@ export class StudentTableComponent implements OnInit {
   public ngOnInit(): void {
     this.unSelectedRow = undefined;
     this.selectedRow = undefined;
-    this.studentService.selectedStudent = undefined;
     this.studentService.studentList$.subscribe((responsibleList) => {
       this.data = mapStudentsToRows(responsibleList);
     });
@@ -48,13 +47,10 @@ export class StudentTableComponent implements OnInit {
   protected onRowUnselect($event: TableRowUnSelectEvent<StudentRow>) {
     this.unSelectedRow = $event.data as StudentRow;
     this.selectedRow = undefined;
-    this.studentService.selectedStudent = this.unSelectedRow.student;
-    this.router.navigate(["/app/student-view"]);
+    this.router.navigate([`/app/student-view/${this.unSelectedRow.student.uid}`]);
   }
 
   protected viewStudent(studentRow: StudentRow): void {
-    console.log(studentRow);
-    this.studentService.selectedStudent = studentRow.student;
-    this.router.navigate(["/app/student-view"]);
+    this.router.navigate([`/app/student-view/${studentRow.student.uid}`]);
   }
 }

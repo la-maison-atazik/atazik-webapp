@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, inject, input, OnInit, signal } from "@angular/core";
 import { Student, StudentNoUid } from "../../../core/models/student.model";
 import { StudentService } from "../../../core/services/student.service";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
 import { PaymentMethod } from "../../../core/models/types/payment-method.type";
 import { MeonOfPayment } from "../../../core/models/types/mean-of-payment.type";
 import { ConfirmationService, MessageService } from "primeng/api";
@@ -27,7 +27,7 @@ import { ToolbarModule } from "primeng/toolbar";
 import { CardModule } from "primeng/card";
 import { InputNumberModule } from "primeng/inputnumber";
 import { TextareaModule } from "primeng/textarea";
-import { DatePipe } from "@angular/common";
+import { DatePipe, Location } from "@angular/common";
 import { FloatLabel } from "primeng/floatlabel";
 import { ACTIVITIES_CATALOG } from "../../../core/constants/activities.constant";
 import { Auth } from "@angular/fire/auth";
@@ -70,11 +70,11 @@ export class StudentViewComponent implements OnInit {
   private responsibleService = inject(ResponsibleService);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
-  protected route = inject(ActivatedRoute);
   protected router = inject(Router);
+  protected location = inject(Location);
   private auth = inject(Auth);
 
-  protected student?: Student = this.studentService.selectedStudent;
+  public student = input.required<Student>();
 
   protected catalog = ACTIVITIES_CATALOG;
 
@@ -158,7 +158,7 @@ export class StudentViewComponent implements OnInit {
   private loadStudent(): void {
     try {
       this.loading.set(true);
-      const s = this.studentService.selectedStudent!;
+      const s = this.student();
 
       // Récupère le profil du responsable lié
       if (s.responsible) {
@@ -169,7 +169,6 @@ export class StudentViewComponent implements OnInit {
           this.studentForm.controls.responsible.setValue("Responsable inconnu");
         }
       }
-      // Convertit Timestamp -> Date si besoin (ex: Firebase)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const toDate = (d: any): Date =>
         d?.toDate ? d.toDate() : d instanceof Date ? d : new Date(d);
@@ -245,7 +244,7 @@ export class StudentViewComponent implements OnInit {
 
   protected addActivity(): void {
     this.activities.push(this.newActivityGroup());
-    this.updateFormEnabledState(); // conserve l'état (lecture/édition)
+    this.updateFormEnabledState();
   }
 
   protected removeActivity(index: number): void {
@@ -275,11 +274,19 @@ export class StudentViewComponent implements OnInit {
       this.studentForm.controls.updatedBy.disable();
       this.studentForm.controls.uid.disable();
       this.studentForm.controls.responsible.disable();
-      this.activities.controls.forEach((ctrl) => ctrl.disable());
     } else {
       this.studentForm.disable();
       this.activities.controls.forEach((ctrl) => ctrl.disable());
     }
+  }
+
+  protected onForfaitChange(activity: FormGroup) {
+    const activityId = activity.get("id")?.value as string;
+    const forfait = activity.get("forfait")?.value as string;
+    const opt = this.catalog
+      .find((c) => c.id === activityId)
+      ?.options.find((o: { label: string }) => o.label === forfait);
+    activity.get("price")?.setValue(opt?.price ?? 0, { emitEvent: false });
   }
 
   protected async save(): Promise<void> {
@@ -320,7 +327,7 @@ export class StudentViewComponent implements OnInit {
     };
 
     try {
-      await this.studentService.update(this.student!.uid!, payload);
+      await this.studentService.update(this.student().uid!, payload);
       this.messageService.add({
         severity: "success",
         summary: "Enregistré",
@@ -368,7 +375,7 @@ export class StudentViewComponent implements OnInit {
       rejectButtonStyleClass: "p-button-secondary",
       accept: async () => {
         try {
-          await this.studentService.delete(this.student!.uid!);
+          await this.studentService.delete(this.student().uid!);
           this.messageService.add({
             severity: "success",
             summary: "Supprimé",

@@ -20,8 +20,6 @@ export class StudentService {
   private studentListSubject = new BehaviorSubject<Student[]>([]);
   studentList$ = this.studentListSubject.asObservable();
 
-  public selectedStudent?: Student;
-
   constructor() {
     this.listenToCollection();
   }
@@ -44,8 +42,10 @@ export class StudentService {
   async update(uid: string, payload: StudentNoUid) {
     try {
       if (!uid) {
-        throw new Error("Student UID is required for update.");
+        console.error("Student UID is required for update.");
+        return;
       }
+
       const ref = collection(
         this.firestore,
         FirestoreCollectionsEnum.STUDENT + "/2025-2026/records",
@@ -63,8 +63,10 @@ export class StudentService {
   async delete(uid: string) {
     try {
       if (!uid) {
-        throw new Error("Student UID is required for delete.");
+        console.error("Student UID is required for delete.");
+        return;
       }
+
       const ref = collection(
         this.firestore,
         FirestoreCollectionsEnum.STUDENT + "/2025-2026/records",
